@@ -69,8 +69,8 @@ public class TestDurableTopicSubscriber implements SimpleJMSConsumer {
         TopicConnectionFactory connFactory = (TopicConnectionFactory) ctx.lookup(conf.getConnectionFactoryName());
         topicConnection = connFactory.createTopicConnection();
         topicConnection.start();
-        topicSession =
-                topicConnection.createTopicSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+        topicSession = topicConnection.createTopicSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+
         // create durable subscriber with subscription ID
         Topic topic = (Topic) ctx.lookup(topicName);
         topicSubscriber = topicSession.createDurableSubscriber(topic, subscriptionId);
