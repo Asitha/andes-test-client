@@ -79,10 +79,10 @@ public class Main {
         CommandLine cmd = parser.parse(options, args, false);
 
         Histogram latencyHist = Main.metrics.histogram(
-                name(ConsumerThread.class, "global", "consumer", "latency")
+                name("global", "consumer", "latency")
         );
         Meter consumerRate = Main.metrics.meter(
-                name(ConsumerThread.class, "global", "consumer", "rate"));
+                name("global", "consumer", "rate"));
 
 
         if (cmd.hasOption("c")) {

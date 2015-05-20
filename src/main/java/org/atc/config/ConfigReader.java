@@ -67,6 +67,8 @@ public class ConfigReader {
 
     public static final String UNSUB_ON_FINISH = "unsubscribe_on_finish";
 
+    public static final String DELAY_BETWEEN_MESSAGES = "delay_between_messages";
+
     public static final String CONSOLE_REPORT = "console_report_enable";
 
     public static final String CONSOLE_REPORT_UPDATE_INTERVAL = "console_report_update_interval_seconds";
@@ -263,6 +265,16 @@ public class ConfigReader {
             pubSubConfig.setTransactionBatchSize((Integer)value);
         } else {
             pubSubConfig.setTransactionBatchSize(1); // default
+        }
+
+        value = yamlSection.get(DELAY_BETWEEN_MESSAGES);
+        if (null != value) {
+            if(value instanceof Integer ) {
+                pubSubConfig.setDelayBetweenMsgs((Integer)value);
+            } else {
+                throw new IllegalArgumentException("Expects an type Integer for " + DELAY_BETWEEN_MESSAGES +
+                        ". Found " + value + " [ " + value.getClass() +" ]" );
+            }
         }
     }
 

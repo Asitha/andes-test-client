@@ -21,6 +21,7 @@ import com.codahale.metrics.Meter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.atc.Main;
+import org.atc.config.PublisherConfig;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -43,12 +44,13 @@ public class PublisherThread implements Runnable {
         jmsPublisher = publisher;
         sentCount = new AtomicInteger(0);
         publishRate = Main.metrics.meter(name(
-                        PublisherThread.class, "publisher", publisher.getConfigs().getId(), "meter")
+                        "publisher", publisher.getConfigs().getQueueName(), "publisher id " + publisher.getConfigs().getId(), "meter")
         );
 
         // Per given period how many messages were sent is taken through this gauge
         Main.gauges.register(
-                name(PublisherThread.class, jmsPublisher.getConfigs().getId(), "sent-stats"),
+                name("Publisher", publisher.getConfigs().getQueueName(),
+                        "publisher id " + jmsPublisher.getConfigs().getId(), "gauge"),
                 new Gauge<Integer>() {
 
                     /**
@@ -76,8 +78,10 @@ public class PublisherThread implements Runnable {
     private void publish() {
         long messageCount = jmsPublisher.getConfigs().getMessageCount();
         String publisherID = jmsPublisher.getConfigs().getId();
-
-        log.info("Starting publisher to send " + messageCount + " messages. Publisher ID: " + publisherID);
+        PublisherConfig config = jmsPublisher.getConfigs();
+        log.info("Starting publisher to send " + messageCount + " messages to ." +
+                config.getQueueName() +
+                "  Publisher ID: " + publisherID);
         Message message = null;
 
         try {
@@ -93,25 +97,38 @@ public class PublisherThread implements Runnable {
                 sentCount.incrementAndGet();
                 publishRate.mark();
 
+                if(config.getDelayBetweenMsgs() > 0) {
+                    Thread.sleep(jmsPublisher.getConfigs().getDelayBetweenMsgs());
+                }
             }
 
-            log.info("Stopping publisher. [ Publisher ID: " + jmsPublisher.getConfigs().getId() + "  ]");
+            log.info("Stopping publisher for " +
+                    jmsPublisher.getConfigs().getQueueName() +
+                    " [ Publisher ID: " + jmsPublisher.getConfigs().getId() + "  ]");
+
             jmsPublisher.close();
         } catch (JMSException e) {
             log.error("Exception occurred while publishing. " +
                     "\n\tPublisher ID: " + publisherID +
                     "\n\tMessage: " + message, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
 
-        log.info("Stopped publisher. [ Publisher ID: " + jmsPublisher.getConfigs().getId() + "  ]");
+        log.info("Stopped publisher for " +
+                jmsPublisher.getConfigs().getQueueName() +
+                " [ Publisher ID: " + jmsPublisher.getConfigs().getId() + "  ]");
     }
 
     private void transactionalPublish() {
         long messageCount = jmsPublisher.getConfigs().getMessageCount();
         String publisherID = jmsPublisher.getConfigs().getId();
+        PublisherConfig config = jmsPublisher.getConfigs();
 
-        log.info("Starting transactional publisher to send " + messageCount + " messages. Publisher ID: " + publisherID);
-        Message message = null;
+        log.info("Starting transactional publisher to send " + messageCount + " messages to " +
+                jmsPublisher.getConfigs().getQueueName() +
+                ". Publisher ID: " + publisherID);
+        Message message;
         int batchSize = jmsPublisher.getConfigs().getTransactionBatchSize();
         List<Message> currentBatch = new ArrayList<Message>(batchSize);
 
@@ -126,6 +143,10 @@ public class PublisherThread implements Runnable {
                     log.trace("message enqueued for transaction: " + message);
                 }
 
+                if(config.getDelayBetweenMsgs() > 0) {
+                    Thread.sleep(jmsPublisher.getConfigs().getDelayBetweenMsgs());
+                }
+
                 if ((currentBatch.size() == batchSize) || (i == messageCount)) {
 
                     jmsPublisher.commit();
@@ -136,6 +157,8 @@ public class PublisherThread implements Runnable {
             } catch (JMSException e) {
                 log.error("Exception occurred while transactional publishing", e);
                 resend(currentBatch);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
 

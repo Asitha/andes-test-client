@@ -27,6 +27,7 @@ public abstract class PubSubConfig extends GlobalConfig{
     private boolean isTransactional;
     private int transactionBatchSize;
     private String failoverParams;
+    private int delayBetweenMsgs;
 
     public PubSubConfig(GlobalConfig globalConfig) {
         super(globalConfig.getUsername(), globalConfig.getPassword(),
@@ -56,6 +57,7 @@ public abstract class PubSubConfig extends GlobalConfig{
         isTransactional = config.isTransactional();
         transactionBatchSize = config.getTransactionBatchSize();
         failoverParams = config.getFailoverParams();
+        delayBetweenMsgs = config.getDelayBetweenMsgs();
     }
 
     void setMessageCount(long messageCount) {
@@ -94,7 +96,6 @@ public abstract class PubSubConfig extends GlobalConfig{
         return isTransactional;
     }
 
-
     public String getFailoverParams() {
         return failoverParams;
     }
@@ -128,5 +129,13 @@ public abstract class PubSubConfig extends GlobalConfig{
         }
 
         return builder.toString();
+    }
+
+    public int getDelayBetweenMsgs() {
+        return delayBetweenMsgs;
+    }
+
+    public void setDelayBetweenMsgs(int delayBetweenMsgs) {
+        this.delayBetweenMsgs = delayBetweenMsgs;
     }
 }

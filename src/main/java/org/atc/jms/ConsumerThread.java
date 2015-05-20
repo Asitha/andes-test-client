@@ -22,6 +22,7 @@ import com.codahale.metrics.Meter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.atc.Main;
+import org.atc.config.SubscriberConfig;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -45,10 +46,12 @@ public class ConsumerThread implements Runnable {
         jmsConsumer = consumer;
         receivedCount = new AtomicInteger(0);
         latencyHist = Main.metrics.histogram(
-                name(ConsumerThread.class, "consumer", jmsConsumer.getConfigs().getId(), "latency")
+                name("consumer", consumer.getConfigs().getQueueName(),
+                        "consumer id " + jmsConsumer.getConfigs().getId(), "latency")
         );
         consumerRate = Main.metrics.meter(
-                name(ConsumerThread.class, "consumer", jmsConsumer.getConfigs().getId(), "rate"));
+                name("consumer", consumer.getConfigs().getQueueName(),
+                        "consumer id " + jmsConsumer.getConfigs().getId(), "rate"));
 
         // Per given period how many messages were sent is taken through this gauge
         Main.gauges.register(
@@ -73,8 +76,9 @@ public class ConsumerThread implements Runnable {
 
         long messageCount = jmsConsumer.getConfigs().getMessageCount();
         String consumerID = jmsConsumer.getConfigs().getId();
-
-        log.info("Starting consumer to receive " + messageCount + " messages. Consumer ID: " + consumerID);
+        SubscriberConfig config = jmsConsumer.getConfigs();
+        log.info("Starting consumer to receive " + messageCount + " messages from " + config.getQueueName() +
+                " Consumer ID: " + consumerID);
         Message message = null;
 
         try {
@@ -93,12 +97,18 @@ public class ConsumerThread implements Runnable {
                 if(log.isTraceEnabled()) {
                     log.trace("message received: " + message);
                 }
+
+                if(config.getDelayBetweenMsgs() > 0) {
+                    Thread.sleep(config.getDelayBetweenMsgs());
+                }
+
             }
 
             log.info("Stopping consumer. [ Consumer ID: " + consumerID + "  ]");
             if(jmsConsumer.getConfigs().isUnsubOnFinish()) {
                 jmsConsumer.unsubscribe();
-                log.info("Un-subscribing consumer [ Consumer ID: " + consumerID + " ]");
+                log.info("Un-subscribing consumer for " + config.getQueueName() +
+                        " [ Consumer ID: " + consumerID + " ]");
             } else {
                 jmsConsumer.close();
                 log.info("Consumer disconnected [ Consumer ID: " + consumerID + " ]");
@@ -107,6 +117,8 @@ public class ConsumerThread implements Runnable {
             log.error("Exception occurred while consuming. " +
                     "\n\tconsumer ID: " + consumerID +
                     "\n\tMessage: " + message, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
 
         log.info("Stopped consumer. [ Consumer ID: " + consumerID + "  ]");
