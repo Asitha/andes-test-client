@@ -14,72 +14,85 @@
  * limitations under the License.
  */
 
-package jms.queue;
+package org.atc.jms.queue;
 
-import jms.SimpleJMSConsumer;
-import jms.config.SubscriberConfig;
+import org.atc.jms.SimpleJMSPublisher;
+import org.atc.config.PublisherConfig;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueSender;
 import javax.jms.QueueSession;
-import javax.jms.MessageConsumer;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Properties;
 
-public class TestQueueReceiver implements SimpleJMSConsumer {
+public class TestQueueSender implements SimpleJMSPublisher {
 
-
+    private static Log log = LogFactory.getLog(TestQueueReceiver.class);
     private QueueConnection queueConnection;
     private QueueSession queueSession;
-    private MessageConsumer consumer;
-    private SubscriberConfig config;
+    private QueueSender queueSender;
+    private PublisherConfig config;
 
-    @Override
-    public Message receive() throws JMSException {
-        return consumer.receive();
-    }
-
-    @Override
-    public void close() throws JMSException {
-        consumer.close();
-        queueSession.close();
-        queueConnection.stop();
-        queueConnection.close();
-    }
-
-    @Override
-    public void unsubscribe() {
-
-    }
-
-    @Override
-    public MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, JMSException {
+    public void init(PublisherConfig conf) throws NamingException, JMSException {
         String queueName = conf.getQueueName();
         Properties properties = new Properties();
         properties.put(Context.INITIAL_CONTEXT_FACTORY, conf.getInitialContextFactory());
         properties.put(conf.getConnectionFactoryPrefix() + "." + conf.getConnectionFactoryName(), conf.getTCPConnectionURL());
-        properties.put("queue."+ queueName, queueName);
+        properties.put("queue." + queueName, queueName);
         InitialContext ctx = new InitialContext(properties);
         // Lookup connection factory
         QueueConnectionFactory connFactory = (QueueConnectionFactory) ctx.lookup(conf.getConnectionFactoryName());
         queueConnection = connFactory.createQueueConnection();
         queueConnection.start();
-        queueSession =
-                queueConnection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
-        //Receive message
-        Queue queue =  (Queue) ctx.lookup(queueName);
-        consumer = queueSession.createConsumer(queue);
+        if(conf.isTransactional()){
+            queueSession = queueConnection.createQueueSession(true, 0);
+        } else {
+            queueSession = queueConnection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+        }
+//        Queue queue = (Queue)ctx.lookup(queueName);
+        Queue queue = queueSession.createQueue(queueName);
+        queueSender = queueSession.createSender(queue);
         config = conf;
-        return consumer;
+
     }
 
     @Override
-    public SubscriberConfig getConfigs() {
+    public Message createTextMessage(String text) throws JMSException {
+        return queueSession.createTextMessage(text);
+    }
+
+    @Override
+    public void send(Message message) throws JMSException {
+        queueSender.send(message);
+    }
+
+    @Override
+    public void commit() throws JMSException {
+        queueSession.commit();
+    }
+
+    @Override
+    public void rollback() throws JMSException {
+        queueSession.rollback();
+    }
+
+    @Override
+    public PublisherConfig getConfigs() {
         return config;
+    }
+
+    @Override
+    public void close() throws JMSException {
+        queueSender.close();
+        queueSession.close();
+        queueConnection.close();
     }
 }

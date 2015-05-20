@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package jms.config;
+package org.atc.config;
 
 import org.apache.commons.lang3.StringUtils;
 
-import static jms.Main.*;
-import static jms.config.ConfigReader.CF_NAME;
-import static jms.config.ConfigReader.CF_NAME_PREFIX;
-import static jms.config.ConfigReader.CLIENT_ID;
-import static jms.config.ConfigReader.CONSOLE_REPORT;
-import static jms.config.ConfigReader.CONSOLE_REPORT_UPDATE_INTERVAL;
-import static jms.config.ConfigReader.CSV_GAUGE_UPDATE_INTERVAL;
-import static jms.config.ConfigReader.CSV_REPORT;
-import static jms.config.ConfigReader.CSV_UPDATE_INTERVAL;
-import static jms.config.ConfigReader.HOSTNAME;
-import static jms.config.ConfigReader.ICF;
-import static jms.config.ConfigReader.JMX_REPORT;
-import static jms.config.ConfigReader.PASSWORD;
-import static jms.config.ConfigReader.PORT;
-import static jms.config.ConfigReader.USERNAME;
-import static jms.config.ConfigReader.VIRTUALHOST_NAME;
+import static org.atc.Main.*;
+import static org.atc.config.ConfigReader.CF_NAME;
+import static org.atc.config.ConfigReader.CF_NAME_PREFIX;
+import static org.atc.config.ConfigReader.CLIENT_ID;
+import static org.atc.config.ConfigReader.CONSOLE_REPORT;
+import static org.atc.config.ConfigReader.CONSOLE_REPORT_UPDATE_INTERVAL;
+import static org.atc.config.ConfigReader.CSV_GAUGE_UPDATE_INTERVAL;
+import static org.atc.config.ConfigReader.CSV_REPORT;
+import static org.atc.config.ConfigReader.CSV_UPDATE_INTERVAL;
+import static org.atc.config.ConfigReader.HOSTNAME;
+import static org.atc.config.ConfigReader.ICF;
+import static org.atc.config.ConfigReader.JMX_REPORT;
+import static org.atc.config.ConfigReader.PASSWORD;
+import static org.atc.config.ConfigReader.PORT;
+import static org.atc.config.ConfigReader.USERNAME;
+import static org.atc.config.ConfigReader.VIRTUALHOST_NAME;
 
 public class GlobalConfig {
     

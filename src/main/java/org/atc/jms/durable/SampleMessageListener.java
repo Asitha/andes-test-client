@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package jms.durable;
+package org.atc.jms.durable;
 
 import javax.jms.*;
 

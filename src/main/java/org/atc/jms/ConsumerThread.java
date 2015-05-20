@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package jms;
+package org.atc.jms;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.atc.Main;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -95,7 +96,13 @@ public class ConsumerThread implements Runnable {
             }
 
             log.info("Stopping consumer. [ Consumer ID: " + consumerID + "  ]");
-            jmsConsumer.close();
+            if(jmsConsumer.getConfigs().isUnsubOnFinish()) {
+                jmsConsumer.unsubscribe();
+                log.info("Un-subscribing consumer [ Consumer ID: " + consumerID + " ]");
+            } else {
+                jmsConsumer.close();
+                log.info("Consumer disconnected [ Consumer ID: " + consumerID + " ]");
+            }
         } catch (JMSException e) {
             log.error("Exception occurred while consuming. " +
                     "\n\tconsumer ID: " + consumerID +

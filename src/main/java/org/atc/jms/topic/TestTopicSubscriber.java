@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package jms.topic;
+package org.atc.jms.topic;
 
-import jms.SimpleJMSConsumer;
-import jms.config.SubscriberConfig;
+import org.atc.jms.SimpleJMSConsumer;
+import org.atc.config.SubscriberConfig;
 
 import javax.jms.JMSException;
 import javax.jms.Message;

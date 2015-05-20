@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package jms.config;
+package org.atc.config;
 
 public class PublisherConfig extends PubSubConfig {
 

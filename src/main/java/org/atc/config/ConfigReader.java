@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package jms.config;
+package org.atc.config;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static jms.Main.CONFIG_FILE_PATH;
+import static org.atc.Main.CONFIG_FILE_PATH;
 
 public class ConfigReader {
 
@@ -64,6 +64,8 @@ public class ConfigReader {
     public static final String FAILOVER_PARAMS = "failover_params";
 
     public static final String PUB_SUB_ID = "id";
+
+    public static final String UNSUB_ON_FINISH = "unsubscribe_on_finish";
 
     public static final String CONSOLE_REPORT = "console_report_enable";
 
@@ -154,6 +156,16 @@ public class ConfigReader {
                         subID = val.toString();
                     }
                     subscriberConfig.setSubscriptionID(subID);
+                }
+
+                val = subscriberInfo.get(UNSUB_ON_FINISH);
+                if(null != val) {
+                    if (val instanceof Boolean) {
+                        subscriberConfig.setUnsubOnFinish((Boolean)val);
+                    } else {
+                        throw new IllegalArgumentException("Boolean value expected for " + UNSUB_ON_FINISH +
+                                "found " + val + "[ " + val.getClass() + " ]");
+                    }
                 }
                 
                 subscriberConfigsList.add(subscriberConfig);

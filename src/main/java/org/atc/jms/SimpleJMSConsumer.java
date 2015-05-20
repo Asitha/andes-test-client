@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package jms;
+package org.atc.jms;
 
-import jms.config.SubscriberConfig;
+import org.atc.config.SubscriberConfig;
 
 import javax.jms.JMSException;
 import javax.jms.Message;

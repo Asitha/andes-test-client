@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package jms;
+package org.atc;
 
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.CsvReporter;
@@ -23,16 +23,19 @@ import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
-import jms.config.ConfigReader;
-import jms.config.GlobalConfig;
-import jms.config.PublisherConfig;
-import jms.config.SubscriberConfig;
-import jms.config.TestConfiguration;
-import jms.durable.TestDurableTopicSubscriber;
-import jms.queue.TestQueueReceiver;
-import jms.queue.TestQueueSender;
-import jms.topic.TestTopicPublisher;
-import jms.topic.TestTopicSubscriber;
+import org.atc.config.ConfigReader;
+import org.atc.config.GlobalConfig;
+import org.atc.config.PublisherConfig;
+import org.atc.config.SubscriberConfig;
+import org.atc.config.TestConfiguration;
+import org.atc.jms.ConsumerThread;
+import org.atc.jms.PublisherThread;
+import org.atc.jms.SimpleJMSConsumer;
+import org.atc.jms.durable.TestDurableTopicSubscriber;
+import org.atc.jms.queue.TestQueueReceiver;
+import org.atc.jms.queue.TestQueueSender;
+import org.atc.jms.topic.TestTopicPublisher;
+import org.atc.jms.topic.TestTopicSubscriber;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;

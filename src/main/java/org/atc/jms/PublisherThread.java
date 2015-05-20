@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package jms;
+package org.atc.jms;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.atc.Main;
 
 import javax.jms.JMSException;
 import javax.jms.Message;

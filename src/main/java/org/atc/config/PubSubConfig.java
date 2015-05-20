@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package jms.config;
+package org.atc.config;
 
 import org.apache.commons.lang3.StringUtils;
 

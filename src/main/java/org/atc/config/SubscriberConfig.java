@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package jms.config;
+package org.atc.config;
 
 public class SubscriberConfig extends PubSubConfig {
     
     private String subscriptionID;
+    private boolean unsubOnFinish;
     
     public SubscriberConfig(GlobalConfig globalConfig) {
         super(globalConfig);
@@ -42,5 +43,13 @@ public class SubscriberConfig extends PubSubConfig {
         SubscriberConfig s = new SubscriberConfig(this);
         s.setId(id);
         return s;
+    }
+
+    public boolean isUnsubOnFinish() {
+        return unsubOnFinish;
+    }
+
+    public void setUnsubOnFinish(boolean unsubOnFinish) {
+        this.unsubOnFinish = unsubOnFinish;
     }
 }

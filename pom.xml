@@ -140,7 +140,7 @@
                             <addClasspath>true</addClasspath>
                             <!--<useUniqueVersions>false</useUniqueVersions>-->
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>jms.Main</mainClass>
+                            <mainClass>org.atc.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

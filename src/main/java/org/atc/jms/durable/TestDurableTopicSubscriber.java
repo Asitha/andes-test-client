@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package jms.durable;
+package org.atc.jms.durable;
 
-import jms.SimpleJMSConsumer;
-import jms.config.SubscriberConfig;
+import org.atc.jms.SimpleJMSConsumer;
+import org.atc.config.SubscriberConfig;
 
 import javax.jms.*;
 import javax.naming.Context;
