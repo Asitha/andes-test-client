@@ -28,9 +28,6 @@ import org.atc.config.GlobalConfig;
 import org.atc.config.PublisherConfig;
 import org.atc.config.SubscriberConfig;
 import org.atc.config.TestConfiguration;
-import org.atc.jms.ConsumerThread;
-import org.atc.jms.PublisherThread;
-import org.atc.jms.SimpleJMSConsumer;
 import org.atc.jms.durable.TestDurableTopicSubscriber;
 import org.atc.jms.queue.TestQueueReceiver;
 import org.atc.jms.queue.TestQueueSender;
@@ -110,7 +107,7 @@ public class Main {
             threadList.add(subThread);
         }
 
-        SimpleJMSConsumer queueReceiver;
+        SimpleConsumer queueReceiver;
         for (SubscriberConfig subscriberConfig : config.getQueueSubscriberConfigList()) {
             queueReceiver = new TestQueueReceiver();
             queueReceiver.subscribe(subscriberConfig);

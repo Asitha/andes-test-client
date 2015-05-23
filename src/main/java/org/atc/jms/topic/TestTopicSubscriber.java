@@ -16,7 +16,7 @@
 
 package org.atc.jms.topic;
 
-import org.atc.jms.SimpleJMSConsumer;
+import org.atc.SimpleConsumer;
 import org.atc.config.SubscriberConfig;
 
 import javax.jms.JMSException;
@@ -33,7 +33,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Properties;
 
-public class TestTopicSubscriber implements SimpleJMSConsumer {
+public class TestTopicSubscriber implements SimpleConsumer {
 
     private TopicConnection topicConnection;
     private TopicSession topicSession;

@@ -16,7 +16,7 @@
 
 package org.atc.jms.queue;
 
-import org.atc.jms.SimpleJMSConsumer;
+import org.atc.SimpleConsumer;
 import org.atc.config.SubscriberConfig;
 
 import javax.jms.JMSException;
@@ -31,7 +31,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Properties;
 
-public class TestQueueReceiver implements SimpleJMSConsumer {
+public class TestQueueReceiver implements SimpleConsumer {
 
 
     private QueueConnection queueConnection;

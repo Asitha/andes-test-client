@@ -16,7 +16,7 @@
 
 package org.atc.jms.durable;
 
-import org.atc.jms.SimpleJMSConsumer;
+import org.atc.SimpleConsumer;
 import org.atc.config.SubscriberConfig;
 
 import javax.jms.*;
@@ -25,7 +25,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Properties;
 
-public class TestDurableTopicSubscriber implements SimpleJMSConsumer {
+public class TestDurableTopicSubscriber implements SimpleConsumer {
 
     private String subscriptionId;
     private TopicConnection topicConnection;

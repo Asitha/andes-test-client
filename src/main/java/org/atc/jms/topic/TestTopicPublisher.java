@@ -16,7 +16,7 @@
 
 package org.atc.jms.topic;
 
-import org.atc.jms.SimpleJMSPublisher;
+import org.atc.SimplePublisher;
 import org.atc.config.PublisherConfig;
 
 import javax.jms.JMSException;
@@ -32,7 +32,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Properties;
 
-public class TestTopicPublisher implements SimpleJMSPublisher {
+public class TestTopicPublisher implements SimplePublisher {
 
     private TopicPublisher topicPublisher;
     private TopicSession topicSession;

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package org.atc.jms;
+package org.atc;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.atc.Main;
 import org.atc.config.PublisherConfig;
 
 import javax.jms.JMSException;
@@ -37,11 +36,11 @@ public class PublisherThread implements Runnable {
     private static Log log = LogFactory.getLog(PublisherThread.class);
     private final Meter publishRate;
 
-    private SimpleJMSPublisher jmsPublisher;
+    private SimplePublisher publisher;
     private AtomicInteger sentCount;
 
-    public PublisherThread(SimpleJMSPublisher publisher) {
-        jmsPublisher = publisher;
+    public PublisherThread(SimplePublisher publisher) {
+        this.publisher = publisher;
         sentCount = new AtomicInteger(0);
         publishRate = Main.metrics.meter(name(
                         "publisher", publisher.getConfigs().getQueueName(), "publisher id " + publisher.getConfigs().getId(), "meter")
@@ -50,7 +49,7 @@ public class PublisherThread implements Runnable {
         // Per given period how many messages were sent is taken through this gauge
         Main.gauges.register(
                 name("Publisher", publisher.getConfigs().getQueueName(),
-                        "publisher id " + jmsPublisher.getConfigs().getId(), "gauge"),
+                        "publisher id " + this.publisher.getConfigs().getId(), "gauge"),
                 new Gauge<Integer>() {
 
                     /**
@@ -68,7 +67,7 @@ public class PublisherThread implements Runnable {
 
     @Override
     public void run() {
-        if(jmsPublisher.getConfigs().isTransactional()) {
+        if(publisher.getConfigs().isTransactional()) {
             transactionalPublish();
         } else {
             publish();
@@ -76,9 +75,9 @@ public class PublisherThread implements Runnable {
     }
 
     private void publish() {
-        long messageCount = jmsPublisher.getConfigs().getMessageCount();
-        String publisherID = jmsPublisher.getConfigs().getId();
-        PublisherConfig config = jmsPublisher.getConfigs();
+        long messageCount = publisher.getConfigs().getMessageCount();
+        String publisherID = publisher.getConfigs().getId();
+        PublisherConfig config = publisher.getConfigs();
         log.info("Starting publisher to send " + messageCount + " messages to ." +
                 config.getQueueName() +
                 "  Publisher ID: " + publisherID);
@@ -87,9 +86,9 @@ public class PublisherThread implements Runnable {
         try {
             for (int i = 1; i <= messageCount; i++) {
 
-                message = jmsPublisher.createTextMessage(i + " Publisher: " + publisherID);
+                message = publisher.createTextMessage(i + " Publisher: " + publisherID);
                 message.setJMSMessageID(Integer.toString(i));
-                jmsPublisher.send(message);
+                publisher.send(message);
 
                 if (log.isTraceEnabled()) {
                     log.trace("message published: " + message);
@@ -98,15 +97,15 @@ public class PublisherThread implements Runnable {
                 publishRate.mark();
 
                 if(config.getDelayBetweenMsgs() > 0) {
-                    Thread.sleep(jmsPublisher.getConfigs().getDelayBetweenMsgs());
+                    Thread.sleep(publisher.getConfigs().getDelayBetweenMsgs());
                 }
             }
 
             log.info("Stopping publisher for " +
-                    jmsPublisher.getConfigs().getQueueName() +
-                    " [ Publisher ID: " + jmsPublisher.getConfigs().getId() + "  ]");
+                    publisher.getConfigs().getQueueName() +
+                    " [ Publisher ID: " + publisher.getConfigs().getId() + "  ]");
 
-            jmsPublisher.close();
+            publisher.close();
         } catch (JMSException e) {
             log.error("Exception occurred while publishing. " +
                     "\n\tPublisher ID: " + publisherID +
@@ -116,27 +115,27 @@ public class PublisherThread implements Runnable {
         }
 
         log.info("Stopped publisher for " +
-                jmsPublisher.getConfigs().getQueueName() +
-                " [ Publisher ID: " + jmsPublisher.getConfigs().getId() + "  ]");
+                publisher.getConfigs().getQueueName() +
+                " [ Publisher ID: " + publisher.getConfigs().getId() + "  ]");
     }
 
     private void transactionalPublish() {
-        long messageCount = jmsPublisher.getConfigs().getMessageCount();
-        String publisherID = jmsPublisher.getConfigs().getId();
-        PublisherConfig config = jmsPublisher.getConfigs();
+        long messageCount = publisher.getConfigs().getMessageCount();
+        String publisherID = publisher.getConfigs().getId();
+        PublisherConfig config = publisher.getConfigs();
 
         log.info("Starting transactional publisher to send " + messageCount + " messages to " +
-                jmsPublisher.getConfigs().getQueueName() +
+                publisher.getConfigs().getQueueName() +
                 ". Publisher ID: " + publisherID);
         Message message;
-        int batchSize = jmsPublisher.getConfigs().getTransactionBatchSize();
+        int batchSize = publisher.getConfigs().getTransactionBatchSize();
         List<Message> currentBatch = new ArrayList<Message>(batchSize);
 
         for (int i = 1; i <= messageCount; i++) {
             try {
-                message = jmsPublisher.createTextMessage(i + " Publisher: " + publisherID);
+                message = publisher.createTextMessage(i + " Publisher: " + publisherID);
                 message.setJMSMessageID(Integer.toString(i));
-                jmsPublisher.send(message);
+                publisher.send(message);
                 currentBatch.add(message);
 
                 if (log.isTraceEnabled()) {
@@ -144,12 +143,12 @@ public class PublisherThread implements Runnable {
                 }
 
                 if(config.getDelayBetweenMsgs() > 0) {
-                    Thread.sleep(jmsPublisher.getConfigs().getDelayBetweenMsgs());
+                    Thread.sleep(publisher.getConfigs().getDelayBetweenMsgs());
                 }
 
                 if ((currentBatch.size() == batchSize) || (i == messageCount)) {
 
-                    jmsPublisher.commit();
+                    publisher.commit();
                     sentCount.addAndGet(currentBatch.size());
                     publishRate.mark(currentBatch.size());
                     currentBatch.clear();
@@ -162,29 +161,29 @@ public class PublisherThread implements Runnable {
             }
         }
 
-        log.info("Stopping transactional publisher. [ Publisher ID: " + jmsPublisher.getConfigs().getId() + "  ]");
+        log.info("Stopping transactional publisher. [ Publisher ID: " + publisher.getConfigs().getId() + "  ]");
         try {
-            jmsPublisher.close();
+            publisher.close();
         } catch (JMSException e) {
             log.error("Exception occurred while closing transactional publisher " + publisherID, e);
         }
 
-        log.info("Stopped publisher. [ Publisher ID: " + jmsPublisher.getConfigs().getId() + "  ]");
+        log.info("Stopped publisher. [ Publisher ID: " + publisher.getConfigs().getId() + "  ]");
     }
 
     private void resend(List<Message> currentBatch) {
         try {
-            jmsPublisher.rollback();
+            publisher.rollback();
             for (Message message : currentBatch) {
-                jmsPublisher.send(message);
+                publisher.send(message);
             }
-            jmsPublisher.commit();
+            publisher.commit();
             sentCount.addAndGet(currentBatch.size());
             publishRate.mark(currentBatch.size());
             currentBatch.clear();
         } catch (JMSException e) {
             try {
-                jmsPublisher.rollback();
+                publisher.rollback();
                 resend(currentBatch);
             } catch (JMSException e1) {
                 log.error("Roll back failed on resend", e);

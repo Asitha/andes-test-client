@@ -16,7 +16,7 @@
 
 package org.atc.jms.queue;
 
-import org.atc.jms.SimpleJMSPublisher;
+import org.atc.SimplePublisher;
 import org.atc.config.PublisherConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,7 +33,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Properties;
 
-public class TestQueueSender implements SimpleJMSPublisher {
+public class TestQueueSender implements SimplePublisher {
 
     private static Log log = LogFactory.getLog(TestQueueReceiver.class);
     private QueueConnection queueConnection;
