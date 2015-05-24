@@ -28,11 +28,11 @@ import org.atc.config.GlobalConfig;
 import org.atc.config.PublisherConfig;
 import org.atc.config.SubscriberConfig;
 import org.atc.config.TestConfiguration;
-import org.atc.jms.durable.TestDurableTopicSubscriber;
-import org.atc.jms.queue.TestQueueReceiver;
-import org.atc.jms.queue.TestQueueSender;
-import org.atc.jms.topic.TestTopicPublisher;
-import org.atc.jms.topic.TestTopicSubscriber;
+import org.atc.amqp.topic.AMQPDurableTopicSubscriber;
+import org.atc.amqp.queue.AMQPQueueReceiver;
+import org.atc.amqp.queue.AMQPQueueSender;
+import org.atc.amqp.topic.AMQPTopicPublisher;
+import org.atc.amqp.topic.AMQPTopicSubscriber;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -42,7 +42,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.slf4j.LoggerFactory;
 
-import javax.jms.JMSException;
 import javax.naming.NamingException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -67,7 +66,7 @@ public class Main {
     private static CsvReporter csvGaugeReporter;
     private static Slf4jReporter slf4jReporter;
 
-    public static void main(String[] args) throws NamingException, JMSException, FileNotFoundException,
+    public static void main(String[] args) throws NamingException, ATCException, FileNotFoundException,
             InterruptedException, ParseException, CloneNotSupportedException {
 
         Options options = createOptions();
@@ -98,9 +97,9 @@ public class Main {
                 config.getQueueSubscriberConfigList().size() + config.getDurableSubscriberConfigList().size();
         final List<Thread> threadList = new ArrayList<Thread>(subscriberCount);
 
-        TestTopicSubscriber topicSubscriber;
+        AMQPTopicSubscriber topicSubscriber;
         for (SubscriberConfig subscriberConfig : config.getTopicSubscriberConfigList()) {
-            topicSubscriber = new TestTopicSubscriber();
+            topicSubscriber = new AMQPTopicSubscriber();
             topicSubscriber.subscribe(subscriberConfig);
             Thread subThread = new Thread(new ConsumerThread(topicSubscriber, latencyHist, consumerRate));
             subThread.start();
@@ -109,16 +108,16 @@ public class Main {
 
         SimpleConsumer queueReceiver;
         for (SubscriberConfig subscriberConfig : config.getQueueSubscriberConfigList()) {
-            queueReceiver = new TestQueueReceiver();
+            queueReceiver = new AMQPQueueReceiver();
             queueReceiver.subscribe(subscriberConfig);
             Thread subThread = new Thread(new ConsumerThread(queueReceiver, latencyHist, consumerRate));
             subThread.start();
             threadList.add(subThread);
         }
 
-        TestDurableTopicSubscriber durableTopicSubscriber;
+        AMQPDurableTopicSubscriber durableTopicSubscriber;
         for (SubscriberConfig subscriberConfig : config.getDurableSubscriberConfigList()) {
-            durableTopicSubscriber = new TestDurableTopicSubscriber();
+            durableTopicSubscriber = new AMQPDurableTopicSubscriber();
             durableTopicSubscriber.subscribe(subscriberConfig);
             Thread subThread = new Thread(new ConsumerThread(durableTopicSubscriber, latencyHist, consumerRate));
             subThread.start();
@@ -127,18 +126,18 @@ public class Main {
 
         // Publishers
 
-        TestTopicPublisher topicPublisher;
+        AMQPTopicPublisher topicPublisher;
         for (PublisherConfig publisherConfig : config.getTopicPublisherList()) {
-            topicPublisher = new TestTopicPublisher();
+            topicPublisher = new AMQPTopicPublisher();
             topicPublisher.init(publisherConfig);
             Thread pubThread = new Thread(new PublisherThread(topicPublisher));
             pubThread.start();
             threadList.add(pubThread);
         }
 
-        TestQueueSender queuePublisher;
+        AMQPQueueSender queuePublisher;
         for (PublisherConfig publisherConfig : config.getQueuePublisherConfigList()) {
-            queuePublisher = new TestQueueSender();
+            queuePublisher = new AMQPQueueSender();
             queuePublisher.init(publisherConfig);
             Thread pubThread = new Thread(new PublisherThread(queuePublisher));
             pubThread.start();

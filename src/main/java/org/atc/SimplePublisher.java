@@ -18,24 +18,26 @@ package org.atc;
 
 import org.atc.config.PublisherConfig;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.naming.NamingException;
 
+/**
+ * Generic interface used by the {@link org.atc.PublisherThread} to publish messages to a
+ * broker.
+ */
 public interface SimplePublisher {
 
-    public void send(Message message) throws JMSException;
+    public void send(ATCMessage ATCMessage) throws ATCException;
 
-    public void commit() throws JMSException;
+    public void commit() throws ATCException;
 
-    public void rollback() throws JMSException;
+    public void rollback() throws ATCException;
 
-    public void init(PublisherConfig conf) throws NamingException, JMSException;
+    public void init(PublisherConfig conf) throws NamingException, ATCException;
 
-    public Message createTextMessage(String text) throws JMSException;
+    public ATCMessage createTextMessage(String text) throws ATCException;
 
     public PublisherConfig getConfigs();
 
-    public void close() throws JMSException;
+    public void close() throws ATCException;
 
 }

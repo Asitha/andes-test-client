@@ -16,24 +16,14 @@
 
 package org.atc;
 
-import org.atc.config.SubscriberConfig;
-
-import javax.jms.MessageConsumer;
-import javax.naming.NamingException;
-
 /**
- * Generic interface for a message consumer used by the {@link org.atc.ConsumerThread} to consume
- * messages
+ * Andes Test Client (ATC) specific exceptions can be handled using this
+ * exception class
  */
-public interface SimpleConsumer {
+public class ATCException extends Exception {
 
-    public SubscriberConfig getConfigs();
+    public ATCException(String message, Throwable t) {
+        super(message, t);
+    }
 
-    public ATCMessage receive() throws ATCException;
-
-    public void close() throws ATCException;
-
-    public void unsubscribe() throws ATCException;
-
-    public MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException;
 }

@@ -20,17 +20,17 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.atc.config.ConfigReader;
 import org.atc.config.PublisherConfig;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
+/**
+ * This class publishes messages of a single {@link org.atc.SimplePublisher} to the broker.
+ * Can be used to publish in a separate thread.
+ */
 public class PublisherThread implements Runnable {
 
     private static Log log = LogFactory.getLog(PublisherThread.class);
@@ -43,10 +43,12 @@ public class PublisherThread implements Runnable {
         this.publisher = publisher;
         sentCount = new AtomicInteger(0);
         publishRate = Main.metrics.meter(name(
-                        "publisher", publisher.getConfigs().getQueueName(), "publisher id " + publisher.getConfigs().getId(), "meter")
+                        "publisher", publisher.getConfigs().getQueueName(),
+                        "publisher id " + publisher.getConfigs().getId(),
+                        "meter")
         );
 
-        // Per given period how many messages were sent is taken through this gauge
+        // Messages sent for a given time period is collected through this gauge
         Main.gauges.register(
                 name("Publisher", publisher.getConfigs().getQueueName(),
                         "publisher id " + this.publisher.getConfigs().getId(), "gauge"),
@@ -81,17 +83,17 @@ public class PublisherThread implements Runnable {
         log.info("Starting publisher to send " + messageCount + " messages to ." +
                 config.getQueueName() +
                 "  Publisher ID: " + publisherID);
-        Message message = null;
+        ATCMessage ATCMessage = null;
 
         try {
             for (int i = 1; i <= messageCount; i++) {
 
-                message = publisher.createTextMessage(i + " Publisher: " + publisherID);
-                message.setJMSMessageID(Integer.toString(i));
-                publisher.send(message);
+                ATCMessage = publisher.createTextMessage(i + " Publisher: " + publisherID);
+                ATCMessage.setMessageID(Integer.toString(i));
+                publisher.send(ATCMessage);
 
                 if (log.isTraceEnabled()) {
-                    log.trace("message published: " + message);
+                    log.trace("message published: " + ATCMessage);
                 }
                 sentCount.incrementAndGet();
                 publishRate.mark();
@@ -106,10 +108,10 @@ public class PublisherThread implements Runnable {
                     " [ Publisher ID: " + publisher.getConfigs().getId() + "  ]");
 
             publisher.close();
-        } catch (JMSException e) {
+        } catch (ATCException e) {
             log.error("Exception occurred while publishing. " +
                     "\n\tPublisher ID: " + publisherID +
-                    "\n\tMessage: " + message, e);
+                    "\n\tMessage: " + ATCMessage, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -122,73 +124,35 @@ public class PublisherThread implements Runnable {
     private void transactionalPublish() {
         long messageCount = publisher.getConfigs().getMessageCount();
         String publisherID = publisher.getConfigs().getId();
-        PublisherConfig config = publisher.getConfigs();
 
         log.info("Starting transactional publisher to send " + messageCount + " messages to " +
                 publisher.getConfigs().getQueueName() +
                 ". Publisher ID: " + publisherID);
-        Message message;
+        ATCMessage ATCMessage;
         int batchSize = publisher.getConfigs().getTransactionBatchSize();
-        List<Message> currentBatch = new ArrayList<Message>(batchSize);
+
+        DisruptorBasedPublisher disruptorPublisher =
+                new DisruptorBasedPublisher(batchSize, publisher, sentCount, publishRate);
 
         for (int i = 1; i <= messageCount; i++) {
             try {
-                message = publisher.createTextMessage(i + " Publisher: " + publisherID);
-                message.setJMSMessageID(Integer.toString(i));
-                publisher.send(message);
-                currentBatch.add(message);
-
-                if (log.isTraceEnabled()) {
-                    log.trace("message enqueued for transaction: " + message);
+                ATCMessage = publisher.createTextMessage(i + " Publisher: " + publisherID);
+                ATCMessage.setMessageID(Integer.toString(i));
+                disruptorPublisher.publish(ATCMessage);
+            } catch (ATCException e) {
+                log.error("Exception occurred while creating message for publisher " + publisherID, e);
+                i--; // resend
+                try {
+                    Thread.sleep(ConfigReader.RESEND_WAIT_INTERVAL_MILLISECONDS); // wait an send again
+                } catch (InterruptedException e1) {
+                    Thread.currentThread().interrupt(); // on interrupt exception throw it.
                 }
-
-                if(config.getDelayBetweenMsgs() > 0) {
-                    Thread.sleep(publisher.getConfigs().getDelayBetweenMsgs());
-                }
-
-                if ((currentBatch.size() == batchSize) || (i == messageCount)) {
-
-                    publisher.commit();
-                    sentCount.addAndGet(currentBatch.size());
-                    publishRate.mark(currentBatch.size());
-                    currentBatch.clear();
-                }
-            } catch (JMSException e) {
-                log.error("Exception occurred while transactional publishing", e);
-                resend(currentBatch);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
             }
         }
 
         log.info("Stopping transactional publisher. [ Publisher ID: " + publisher.getConfigs().getId() + "  ]");
-        try {
-            publisher.close();
-        } catch (JMSException e) {
-            log.error("Exception occurred while closing transactional publisher " + publisherID, e);
-        }
-
+        disruptorPublisher.closePublisher();
+        disruptorPublisher.shutdown();
         log.info("Stopped publisher. [ Publisher ID: " + publisher.getConfigs().getId() + "  ]");
-    }
-
-    private void resend(List<Message> currentBatch) {
-        try {
-            publisher.rollback();
-            for (Message message : currentBatch) {
-                publisher.send(message);
-            }
-            publisher.commit();
-            sentCount.addAndGet(currentBatch.size());
-            publishRate.mark(currentBatch.size());
-            currentBatch.clear();
-        } catch (JMSException e) {
-            try {
-                publisher.rollback();
-                resend(currentBatch);
-            } catch (JMSException e1) {
-                log.error("Roll back failed on resend", e);
-                resend(currentBatch);
-            }
-        }
     }
 }

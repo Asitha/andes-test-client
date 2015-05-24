@@ -106,5 +106,6 @@ queue_subscribers:
 #   - queue_name: a.b.c.d
 #     message_count: 1000
 #     sub_id: new_sub
+#     unsubscribe_on_finish: true
 
 # End of subscriber configurations

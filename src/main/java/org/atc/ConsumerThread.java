@@ -23,13 +23,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.atc.config.SubscriberConfig;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
+/**
+ * This thread handles a single {@link org.atc.SimpleConsumer} and logs all the stats
+ */
 public class ConsumerThread implements Runnable {
 
     SimpleConsumer consumer;
@@ -41,6 +41,12 @@ public class ConsumerThread implements Runnable {
     private final Histogram globalLatencyHist;
     private final Meter globalConsumerRate;
 
+    /**
+     * Creates a new consumer thread for a given consumer
+     * @param consumer Reference to the {@link org.atc.SimpleConsumer} implementation that need to run
+     * @param globalLatency Metrics {@link com.codahale.metrics.Histogram} that calculates global latency
+     * @param globalConsumerRate Metrics {@link com.codahale.metrics.Meter} that calculates global consumer rate
+     */
     public ConsumerThread(SimpleConsumer consumer, Histogram globalLatency, Meter globalConsumerRate) {
         this.consumer = consumer;
         receivedCount = new AtomicInteger(0);
@@ -78,7 +84,7 @@ public class ConsumerThread implements Runnable {
         SubscriberConfig config = consumer.getConfigs();
         log.info("Starting consumer to receive " + messageCount + " messages from " + config.getQueueName() +
                 " Consumer ID: " + consumerID);
-        Message message = null;
+        ATCMessage message = null;
 
         try {
             long latency;
@@ -86,7 +92,7 @@ public class ConsumerThread implements Runnable {
 
                 message = consumer.receive();
 
-                latency = System.currentTimeMillis() - message.getJMSTimestamp();
+                latency = System.currentTimeMillis() - message.getTimeStamp();
                 latencyHist.update(latency);
                 globalLatencyHist.update(latency);
                 receivedCount.incrementAndGet();
@@ -100,19 +106,19 @@ public class ConsumerThread implements Runnable {
                 if(config.getDelayBetweenMsgs() > 0) {
                     Thread.sleep(config.getDelayBetweenMsgs());
                 }
-
             }
 
             log.info("Stopping consumer. [ Consumer ID: " + consumerID + "  ]");
             if(consumer.getConfigs().isUnsubOnFinish()) {
                 consumer.unsubscribe();
+                consumer.close();
                 log.info("Un-subscribing consumer for " + config.getQueueName() +
                         " [ Consumer ID: " + consumerID + " ]");
             } else {
                 consumer.close();
                 log.info("Consumer disconnected [ Consumer ID: " + consumerID + " ]");
             }
-        } catch (JMSException e) {
+        } catch (ATCException e) {
             log.error("Exception occurred while consuming. " +
                     "\n\tconsumer ID: " + consumerID +
                     "\n\tMessage: " + message, e);
