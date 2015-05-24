@@ -70,6 +70,10 @@ public class TxPublishHandler implements EventHandler<PublishEvent> {
                 publisher.commit();
                 sentCount.addAndGet(messagesList.size());
                 publishRate.mark(messagesList.size());
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Messages committed. Batch size " + messagesList.size());
+                }
                 messagesList.clear();
             }
 

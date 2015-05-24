@@ -92,8 +92,8 @@ public class PublisherThread implements Runnable {
                 ATCMessage.setMessageID(Integer.toString(i));
                 publisher.send(ATCMessage);
 
-                if (log.isTraceEnabled()) {
-                    log.trace("message published: " + ATCMessage);
+                if (log.isDebugEnabled()) {
+                    log.debug("Message published: " + ATCMessage);
                 }
                 sentCount.incrementAndGet();
                 publishRate.mark();

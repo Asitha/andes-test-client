@@ -99,8 +99,8 @@ public class ConsumerThread implements Runnable {
 
                 consumerRate.mark();
                 globalConsumerRate.mark();
-                if(log.isTraceEnabled()) {
-                    log.trace("message received: " + message);
+                if(log.isDebugEnabled()) {
+                    log.debug("Message received: " + message);
                 }
 
                 if(config.getDelayBetweenMsgs() > 0) {
