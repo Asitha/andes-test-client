@@ -13,7 +13,7 @@ Currently this client supports testing AMQP protocol based functionality of MB. 
 
 > - Message Publishers (Topic and queue)
 >   - multiple publishers (same and different queues)
->   - transactional message publishing
+>   - [Disruptor](https://lmax-exchange.github.io/disruptor/) based transactional message publishing
 >   - publisher failover configuration
 >  
 > - Message Subscribers (Topic and queue)
