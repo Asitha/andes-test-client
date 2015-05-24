@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package org.atc.jms;
+package org.atc;
 
-import org.atc.config.SubscriberConfig;
+/**
+ * Andes Test Client (ATC) specific exceptions can be handled using this
+ * exception class
+ */
+public class ATCException extends Exception {
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.naming.NamingException;
+    public ATCException(String message, Throwable t) {
+        super(message, t);
+    }
 
-public interface SimpleJMSConsumer {
-
-    public SubscriberConfig getConfigs();
-
-    public Message receive() throws JMSException;
-
-    public void close() throws JMSException;
-
-    public void unsubscribe() throws JMSException;
-
-    public MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, JMSException;
 }

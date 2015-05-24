@@ -1,0 +1,43 @@
+/*
+ * Copyright 2015 Asitha Nanayakkara
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.atc;
+
+import org.atc.config.PublisherConfig;
+
+import javax.naming.NamingException;
+
+/**
+ * Generic interface used by the {@link org.atc.PublisherThread} to publish messages to a
+ * broker.
+ */
+public interface SimplePublisher {
+
+    public void send(ATCMessage ATCMessage) throws ATCException;
+
+    public void commit() throws ATCException;
+
+    public void rollback() throws ATCException;
+
+    public void init(PublisherConfig conf) throws NamingException, ATCException;
+
+    public ATCMessage createTextMessage(String text) throws ATCException;
+
+    public PublisherConfig getConfigs();
+
+    public void close() throws ATCException;
+
+}

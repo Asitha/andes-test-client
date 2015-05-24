@@ -31,55 +31,57 @@ import static org.atc.Main.CONFIG_FILE_PATH;
 
 public class ConfigReader {
 
-    public static final String HOSTNAME = "hostname";
-    public static final String PORT = "port";
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
+    public static final int RESEND_WAIT_INTERVAL_MILLISECONDS = 1000;
 
-    public static final String ICF = "initial_context_factory";
-    public static final String CF_NAME_PREFIX = "connection_factory_name_prefix";
-    public static final String CF_NAME = "connection_factory_name";
-    public static final String CLIENT_ID = "client_id";
-    public static final String VIRTUALHOST_NAME = "virtualhost_name";
+    static final String HOSTNAME = "hostname";
+    static final String PORT = "port";
+    static final String USERNAME = "username";
+    static final String PASSWORD = "password";
 
-    public static final String TRANSACTIONAL_CLIENT = "transaction_enable";
-    public static final String TRANSACTION_BATCH_SIZE = "transaction_batch_size";
+    static final String ICF = "initial_context_factory";
+    static final String CF_NAME_PREFIX = "connection_factory_name_prefix";
+    static final String CF_NAME = "connection_factory_name";
+    static final String CLIENT_ID = "client_id";
+    static final String VIRTUALHOST_NAME = "virtualhost_name";
 
-    public static final String TOPIC_PUBLISHERS = "topic_publishers";
-    public static final String MESSAGE_COUNT = "message_count";
-    public static final String PARALLEL_THREADS = "parallel_threads";
-    public static final String SUBSCRIPTION_ID = "sub_id";
-    public static final String PRINT_PER_MESSAGES = "print_per_messages";
-    
-    public static final String QUEUE_NAME = "queue_name";
+    static final String TRANSACTIONAL_CLIENT = "transaction_enable";
+    static final String TRANSACTION_BATCH_SIZE = "transaction_batch_size";
 
-    public static final String TOPIC_SUBSCRIBERS = "topic_subscribers";
-    
-    public static final String QUEUE_SUBSCRIBERS = "queue_subscribers";
-    
-    public static final String QUEUE_PUBLISHERS = "queue_publishers";
-    
-    public static final String DURABLE_SUBSCRIPTION = "durable_subscribers";
+    static final String TOPIC_PUBLISHERS = "topic_publishers";
+    static final String MESSAGE_COUNT = "message_count";
+    static final String PARALLEL_THREADS = "parallel_threads";
+    static final String SUBSCRIPTION_ID = "sub_id";
+    static final String PRINT_PER_MESSAGES = "print_per_messages";
 
-    public static final String FAILOVER_PARAMS = "failover_params";
+    static final String QUEUE_NAME = "queue_name";
 
-    public static final String PUB_SUB_ID = "id";
+    static final String TOPIC_SUBSCRIBERS = "topic_subscribers";
 
-    public static final String UNSUB_ON_FINISH = "unsubscribe_on_finish";
+    static final String QUEUE_SUBSCRIBERS = "queue_subscribers";
 
-    public static final String DELAY_BETWEEN_MESSAGES = "delay_between_messages";
+    static final String QUEUE_PUBLISHERS = "queue_publishers";
 
-    public static final String CONSOLE_REPORT = "console_report_enable";
+    static final String DURABLE_SUBSCRIPTION = "durable_subscribers";
 
-    public static final String CONSOLE_REPORT_UPDATE_INTERVAL = "console_report_update_interval_seconds";
+    static final String FAILOVER_PARAMS = "failover_params";
 
-    public static final String JMX_REPORT = "jmx_report_enable";
-    
-    public static final String CSV_REPORT = "csv_report_enable";
-    
-    public static final String CSV_UPDATE_INTERVAL = "csv_report_update_interval_seconds";
+    static final String PUB_SUB_ID = "id";
 
-    public static final String CSV_GAUGE_UPDATE_INTERVAL = "csv_gauges_update_interval_milis";
+    static final String UNSUB_ON_FINISH = "unsubscribe_on_finish";
+
+    static final String DELAY_BETWEEN_MESSAGES = "delay_between_messages";
+
+    static final String CONSOLE_REPORT = "console_report_enable";
+
+    static final String CONSOLE_REPORT_UPDATE_INTERVAL = "console_report_update_interval_seconds";
+
+    static final String JMX_REPORT = "jmx_report_enable";
+
+    static final String CSV_REPORT = "csv_report_enable";
+
+    static final String CSV_UPDATE_INTERVAL = "csv_report_update_interval_seconds";
+
+    static final String CSV_GAUGE_UPDATE_INTERVAL = "csv_gauges_update_interval_milis";
 
     public static TestConfiguration parseConfig(final String filePath) throws FileNotFoundException, CloneNotSupportedException {
 

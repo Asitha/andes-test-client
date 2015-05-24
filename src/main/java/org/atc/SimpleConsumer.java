@@ -14,28 +14,26 @@
  * limitations under the License.
  */
 
-package org.atc.jms;
+package org.atc;
 
-import org.atc.config.PublisherConfig;
+import org.atc.config.SubscriberConfig;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
+import javax.jms.MessageConsumer;
 import javax.naming.NamingException;
 
-public interface SimpleJMSPublisher {
+/**
+ * Generic interface for a message consumer used by the {@link org.atc.ConsumerThread} to consume
+ * messages
+ */
+public interface SimpleConsumer {
 
-    public void send(Message message) throws JMSException;
+    public SubscriberConfig getConfigs();
 
-    public void commit() throws JMSException;
+    public ATCMessage receive() throws ATCException;
 
-    public void rollback() throws JMSException;
+    public void close() throws ATCException;
 
-    public void init(PublisherConfig conf) throws NamingException, JMSException;
+    public void unsubscribe() throws ATCException;
 
-    public Message createTextMessage(String text) throws JMSException;
-
-    public PublisherConfig getConfigs();
-
-    public void close() throws JMSException;
-
+    public MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException;
 }
