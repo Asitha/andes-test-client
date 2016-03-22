@@ -67,7 +67,6 @@ public class PublisherThread implements Runnable {
                 });
     }
 
-    @Override
     public void run() {
         if(publisher.getConfigs().isTransactional()) {
             transactionalPublish();
@@ -80,20 +79,18 @@ public class PublisherThread implements Runnable {
         long messageCount = publisher.getConfigs().getMessageCount();
         String publisherID = publisher.getConfigs().getId();
         PublisherConfig config = publisher.getConfigs();
-        log.info("Starting publisher to send " + messageCount + " messages to ." +
-                config.getQueueName() +
+        log.info("Starting publisher to send " + messageCount + " messages to ." + config.getQueueName() +
                 "  Publisher ID: " + publisherID);
-        ATCMessage ATCMessage = null;
+        ATCMessage atcMessage = null;
 
         try {
+            atcMessage = publisher.createTextMessage(null);
             for (int i = 1; i <= messageCount; i++) {
 
-                ATCMessage = publisher.createTextMessage(i + " Publisher: " + publisherID);
-                ATCMessage.setMessageID(Integer.toString(i));
-                publisher.send(ATCMessage);
+                publisher.send(atcMessage);
 
                 if (log.isDebugEnabled()) {
-                    log.debug("Message published: " + ATCMessage);
+                    log.debug("Message published: " + atcMessage);
                 }
                 sentCount.incrementAndGet();
                 publishRate.mark();
@@ -103,15 +100,13 @@ public class PublisherThread implements Runnable {
                 }
             }
 
-            log.info("Stopping publisher for " +
-                    publisher.getConfigs().getQueueName() +
+            log.info("Stopping publisher for " + publisher.getConfigs().getQueueName() +
                     " [ Publisher ID: " + publisher.getConfigs().getId() + "  ]");
 
             publisher.close();
         } catch (ATCException e) {
-            log.error("Exception occurred while publishing. " +
-                    "\n\tPublisher ID: " + publisherID +
-                    "\n\tMessage: " + ATCMessage, e);
+            log.error("Exception occurred while publishing.\n\tPublisher ID: " + publisherID + "\n\tMessage: "
+                    + atcMessage, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -126,8 +121,7 @@ public class PublisherThread implements Runnable {
         String publisherID = publisher.getConfigs().getId();
 
         log.info("Starting transactional publisher to send " + messageCount + " messages to " +
-                publisher.getConfigs().getQueueName() +
-                ". Publisher ID: " + publisherID);
+                publisher.getConfigs().getQueueName() + ". Publisher ID: " + publisherID);
         ATCMessage ATCMessage;
         int batchSize = publisher.getConfigs().getTransactionBatchSize();
 

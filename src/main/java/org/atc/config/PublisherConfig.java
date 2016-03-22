@@ -16,27 +16,24 @@
 
 package org.atc.config;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+
+@SuppressWarnings("unused")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class PublisherConfig extends PubSubConfig {
 
+    @XmlAttribute
     private int publisherMaxThroughput;
+    @XmlAttribute
     private String messageContent;
-
-    
-    public PublisherConfig(GlobalConfig globalConfig) {
-        super(globalConfig);
-    }
-
-    public PublisherConfig(PublisherConfig config) {
-        super(config);
-        messageContent = config.getMessageContent();
-        publisherMaxThroughput = config.getPublisherMaxThroughput();
-    }
 
     public int getPublisherMaxThroughput() {
         return publisherMaxThroughput;
     }
 
-    public void setPublisherMaxThroughput(int publisherMaxThroughput) {
+    void setPublisherMaxThroughput(int publisherMaxThroughput) {
         this.publisherMaxThroughput = publisherMaxThroughput;
     }
 
@@ -44,13 +41,13 @@ public class PublisherConfig extends PubSubConfig {
         return messageContent;
     }
 
-    public void setMessageContent(String messageContent) {
+    void setMessageContent(String messageContent) {
         this.messageContent = messageContent;
     }
 
-    public PublisherConfig newPublisherConfig(String id) {
-        PublisherConfig p = new PublisherConfig(this);
-        p.setId(id);
-        return p;
+    PublisherConfig copy() throws NoSuchFieldException, IllegalAccessException {
+        PublisherConfig copy = new PublisherConfig();
+        copyMembers(this, copy);
+        return copy;
     }
 }

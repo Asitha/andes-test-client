@@ -42,10 +42,10 @@ public class AMQPQueueReceiver implements SimpleConsumer {
     private MessageConsumer consumer;
     private SubscriberConfig config;
 
-    @Override
     public ATCMessage receive() throws ATCException {
         try {
             Message message = consumer.receive();
+            message.acknowledge();
             return MessageUtils.fromJMSToATC(message);
         } catch (JMSException e) {
             throw new ATCException("Error occurred while processing received message. Subscriber id: " +
@@ -54,7 +54,6 @@ public class AMQPQueueReceiver implements SimpleConsumer {
 
     }
 
-    @Override
     public void close() throws ATCException {
         try {
             consumer.close();
@@ -66,12 +65,10 @@ public class AMQPQueueReceiver implements SimpleConsumer {
         }
     }
 
-    @Override
     public void unsubscribe() {
 
     }
 
-    @Override
     public MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException {
         try {
             String queueName = conf.getQueueName();
@@ -96,7 +93,6 @@ public class AMQPQueueReceiver implements SimpleConsumer {
         }
     }
 
-    @Override
     public SubscriberConfig getConfigs() {
         return config;
     }

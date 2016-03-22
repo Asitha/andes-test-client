@@ -27,13 +27,13 @@ import javax.naming.NamingException;
  */
 public interface SimpleConsumer {
 
-    public SubscriberConfig getConfigs();
+    SubscriberConfig getConfigs();
 
-    public ATCMessage receive() throws ATCException;
+    ATCMessage receive() throws ATCException;
 
-    public void close() throws ATCException;
+    void close() throws ATCException;
 
-    public void unsubscribe() throws ATCException;
+    void unsubscribe() throws ATCException;
 
-    public MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException;
+    MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException;
 }

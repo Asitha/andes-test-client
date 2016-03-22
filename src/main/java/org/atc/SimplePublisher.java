@@ -26,18 +26,18 @@ import javax.naming.NamingException;
  */
 public interface SimplePublisher {
 
-    public void send(ATCMessage ATCMessage) throws ATCException;
+    void send(ATCMessage atcMessage) throws ATCException;
 
-    public void commit() throws ATCException;
+    void commit() throws ATCException;
 
-    public void rollback() throws ATCException;
+    void rollback() throws ATCException;
 
-    public void init(PublisherConfig conf) throws NamingException, ATCException;
+    void init(PublisherConfig conf) throws NamingException, ATCException;
 
-    public ATCMessage createTextMessage(String text) throws ATCException;
+    ATCMessage createTextMessage(String text) throws ATCException;
 
-    public PublisherConfig getConfigs();
+    PublisherConfig getConfigs();
 
-    public void close() throws ATCException;
+    void close() throws ATCException;
 
 }

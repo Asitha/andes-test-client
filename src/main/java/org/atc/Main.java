@@ -24,7 +24,6 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
 import org.atc.config.ConfigReader;
-import org.atc.config.GlobalConfig;
 import org.atc.config.PublisherConfig;
 import org.atc.config.SubscriberConfig;
 import org.atc.config.TestConfiguration;
@@ -56,21 +55,22 @@ public class Main {
 
     private static Log log = LogFactory.getLog(Main.class);
 
-    public static final MetricRegistry metrics = new MetricRegistry();
-    public static final MetricRegistry gauges = new MetricRegistry();
+    static final MetricRegistry metrics = new MetricRegistry();
+    static final MetricRegistry gauges = new MetricRegistry();
 
-    public static String CONFIG_FILE_PATH;
     private static ConsoleReporter reporter;
     private static JmxReporter jmxReporter;
     private static CsvReporter csvReporter;
     private static CsvReporter csvGaugeReporter;
     private static Slf4jReporter slf4jReporter;
 
+    private Main() {
+    }
+
     public static void main(String[] args) throws NamingException, ATCException, FileNotFoundException,
-            InterruptedException, ParseException, CloneNotSupportedException {
+            InterruptedException, ParseException, NoSuchFieldException, IllegalAccessException {
 
         Options options = createOptions();
-
         CommandLineParser parser = new BasicParser();
         CommandLine cmd = parser.parse(options, args, false);
 
@@ -81,24 +81,24 @@ public class Main {
                 name("global", "consumer", "rate"));
 
 
+        String configFilePath;
         if (cmd.hasOption("c")) {
-            CONFIG_FILE_PATH = cmd.getOptionValue("c");
+            configFilePath = cmd.getOptionValue("c");
         } else {
-            CONFIG_FILE_PATH = System.getProperty("user.dir") + "/conf/client.yaml";
+            configFilePath = System.getProperty("user.dir") + "/conf/client.yaml";
         }
 
-        TestConfiguration config = ConfigReader.parseConfig(CONFIG_FILE_PATH);
-//        System.setProperty("qpid.flow_control_wait_failure", "1500000");
-        // Subscribers
+        TestConfiguration config = ConfigReader.parseConfig(configFilePath);
+        System.setProperty("qpid.flow_control_wait_failure", "1500000");
 
-        startStatReporting(config.getGlobalConfig());
+        startStatReporting(config);
 
-        int subscriberCount = config.getTopicSubscriberConfigList().size() +
-                config.getQueueSubscriberConfigList().size() + config.getDurableSubscriberConfigList().size();
+        int subscriberCount = config.getTopicSubscribers().size() +
+                config.getQueueSubscribers().size() + config.getDurableTopicSubscribers().size();
         final List<Thread> threadList = new ArrayList<Thread>(subscriberCount);
 
         AMQPTopicSubscriber topicSubscriber;
-        for (SubscriberConfig subscriberConfig : config.getTopicSubscriberConfigList()) {
+        for (SubscriberConfig subscriberConfig : config.getTopicSubscribers()) {
             topicSubscriber = new AMQPTopicSubscriber();
             topicSubscriber.subscribe(subscriberConfig);
             Thread subThread = new Thread(new ConsumerThread(topicSubscriber, latencyHist, consumerRate));
@@ -107,7 +107,7 @@ public class Main {
         }
 
         SimpleConsumer queueReceiver;
-        for (SubscriberConfig subscriberConfig : config.getQueueSubscriberConfigList()) {
+        for (SubscriberConfig subscriberConfig : config.getQueueSubscribers()) {
             queueReceiver = new AMQPQueueReceiver();
             queueReceiver.subscribe(subscriberConfig);
             Thread subThread = new Thread(new ConsumerThread(queueReceiver, latencyHist, consumerRate));
@@ -116,7 +116,7 @@ public class Main {
         }
 
         AMQPDurableTopicSubscriber durableTopicSubscriber;
-        for (SubscriberConfig subscriberConfig : config.getDurableSubscriberConfigList()) {
+        for (SubscriberConfig subscriberConfig : config.getDurableTopicSubscribers()) {
             durableTopicSubscriber = new AMQPDurableTopicSubscriber();
             durableTopicSubscriber.subscribe(subscriberConfig);
             Thread subThread = new Thread(new ConsumerThread(durableTopicSubscriber, latencyHist, consumerRate));
@@ -125,9 +125,8 @@ public class Main {
         }
 
         // Publishers
-
         AMQPTopicPublisher topicPublisher;
-        for (PublisherConfig publisherConfig : config.getTopicPublisherList()) {
+        for (PublisherConfig publisherConfig : config.getTopicPublishers()) {
             topicPublisher = new AMQPTopicPublisher();
             topicPublisher.init(publisherConfig);
             Thread pubThread = new Thread(new PublisherThread(topicPublisher));
@@ -136,7 +135,7 @@ public class Main {
         }
 
         AMQPQueueSender queuePublisher;
-        for (PublisherConfig publisherConfig : config.getQueuePublisherConfigList()) {
+        for (PublisherConfig publisherConfig : config.getQueuePublishers()) {
             queuePublisher = new AMQPQueueSender();
             queuePublisher.init(publisherConfig);
             Thread pubThread = new Thread(new PublisherThread(queuePublisher));
@@ -145,7 +144,6 @@ public class Main {
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
-
             @Override
             public void run() {
                 log.info("Shutting down test client.");
@@ -155,12 +153,10 @@ public class Main {
                 if(null != jmxReporter) {
                     jmxReporter.close();
                 }
-
                 if(null != csvReporter) {
                     csvReporter.report();
                     csvReporter.close();
                 }
-
                 for (Thread t: threadList) {
                     t.interrupt();
                 }
@@ -168,7 +164,7 @@ public class Main {
         });
 
 
-        // barrier. wait till all the done
+        // barrier. wait till all done
         for (Thread thread : threadList) {
             thread.join();
         }
@@ -183,7 +179,7 @@ public class Main {
         return options;
     }
 
-    static void startStatReporting(GlobalConfig config) {
+    private static void startStatReporting(TestConfiguration config) {
         // console reporter is created by default to provide a report when shutting down
         reporter = ConsoleReporter.forRegistry(metrics)
                 .convertRatesTo(TimeUnit.SECONDS)
@@ -221,7 +217,7 @@ public class Main {
         }
     }
 
-    static void startCSVReport(int csvReportRefreshRate) {
+    private static void startCSVReport(int csvReportRefreshRate) {
         csvReporter = CsvReporter.forRegistry(metrics)
                 .formatFor(Locale.US)
                 .convertRatesTo(TimeUnit.SECONDS)

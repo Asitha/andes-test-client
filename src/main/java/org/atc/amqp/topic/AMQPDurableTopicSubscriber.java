@@ -36,13 +36,11 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
     private TopicSubscriber topicSubscriber;
     private SubscriberConfig config;
 
-    @Override
-    public SubscriberConfig getConfigs() {
+    final public SubscriberConfig getConfigs() {
         return config;
     }
 
-    @Override
-    public ATCMessage receive() throws ATCException {
+    final public ATCMessage receive() throws ATCException {
         try {
             Message m = topicSubscriber.receive();
             return MessageUtils.fromJMSToATC(m);
@@ -52,8 +50,7 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
         }
     }
 
-    @Override
-    public void close() throws ATCException {
+    final public void close() throws ATCException {
         try {
             topicSubscriber.close();
             topicSession.close();
@@ -63,8 +60,7 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
         }
     }
 
-    @Override
-    public void unsubscribe() throws ATCException {
+    final public void unsubscribe() throws ATCException {
         try {
             topicSession.unsubscribe(subscriptionId);
         } catch (JMSException e) {
@@ -72,8 +68,7 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
         }
     }
 
-    @Override
-    public MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException {
+    final public MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException {
 
         try {
             String topicName = conf.getQueueName();
@@ -87,7 +82,7 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
             TopicConnectionFactory connFactory = (TopicConnectionFactory) ctx.lookup(conf.getConnectionFactoryName());
             topicConnection = connFactory.createTopicConnection();
             topicConnection.start();
-            topicSession = topicConnection.createTopicSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+            topicSession = topicConnection.createTopicSession(true, TopicSession.AUTO_ACKNOWLEDGE);
 
             // create durable subscriber with subscription ID
             Topic topic = (Topic) ctx.lookup(topicName);

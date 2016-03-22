@@ -67,21 +67,19 @@ public class AMQPQueueSender implements SimplePublisher {
         }
     }
 
-    @Override
     public ATCMessage createTextMessage(String text) throws ATCException {
         return new ATCMessage(text);
     }
-    @Override
-    public void send(ATCMessage message) throws ATCException {
+
+    public void send(ATCMessage atcMessage) throws ATCException {
         try {
-            Message m = MessageUtils.fromATCToJMS(queueSession, message);
+            Message m = MessageUtils.fromATCToJMS(queueSession, atcMessage);
             queueSender.send(m);
         } catch (JMSException e) {
             throw new ATCException("Error occurred while sending message. Publisher id" + config.getId(), e);
         }
     }
 
-    @Override
     public void commit() throws ATCException{
         try {
             queueSession.commit();
@@ -90,7 +88,6 @@ public class AMQPQueueSender implements SimplePublisher {
         }
     }
 
-    @Override
     public void rollback() throws ATCException {
         try {
             queueSession.rollback();
@@ -99,17 +96,15 @@ public class AMQPQueueSender implements SimplePublisher {
         }
     }
 
-    @Override
     public PublisherConfig getConfigs() {
         return config;
     }
 
-    @Override
     public void close() throws ATCException {
         try {
             queueSender.close();
             queueSession.close();
-            queueConnection.close();
+//            queueConnection.close();
         } catch (JMSException e) {
             throw new ATCException("Exception occurred while closing publisher " + config.getId(), e);
 

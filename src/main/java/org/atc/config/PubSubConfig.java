@@ -18,102 +18,83 @@ package org.atc.config;
 
 import org.apache.commons.lang3.StringUtils;
 
-public abstract class PubSubConfig extends GlobalConfig{
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import java.lang.reflect.Field;
+import java.util.UUID;
 
+@SuppressWarnings("unused")
+@XmlAccessorType(XmlAccessType.FIELD)
+public abstract class PubSubConfig {
+
+    @XmlAttribute
+    private int port;
+    @XmlAttribute
+    private String hostname;
+    @XmlAttribute
+    private String username;
+    @XmlAttribute
+    private String password;
+    @XmlAttribute
+    private String initialContextFactory;
+    @XmlAttribute
+    private String connectionFactoryPrefix;
+    @XmlAttribute
+    private String connectionFactoryName;
+    @XmlAttribute
+    private String clientID;
+    @XmlAttribute
+    private String virtualHostName;
+    @XmlAttribute(required = true)
     private long messageCount;
-    private int parallelPublishers;
+    @XmlAttribute
+    private int parallelThreads;
+    @XmlAttribute(required = true)
     private String queueName;
+    @XmlAttribute
     private String id;
+    @XmlAttribute
     private boolean isTransactional;
+    @XmlAttribute
     private int transactionBatchSize;
+    @XmlAttribute
     private String failoverParams;
+    @XmlAttribute
     private int delayBetweenMsgs;
 
-    public PubSubConfig(GlobalConfig globalConfig) {
-        super(globalConfig.getUsername(), globalConfig.getPassword(),
-                globalConfig.getHostname(), globalConfig.getPort(),
-                globalConfig.getInitialContextFactory(), globalConfig.getConnectionFactoryPrefix(),
-                globalConfig.getConnectionFactoryName(), globalConfig.getClientID(),
-                globalConfig.getVirtualHostName(), globalConfig.getPrintPerMessages(),
-                globalConfig.isEnableConsoleReport(), globalConfig.getConsoleReportUpdateInterval(),
-                globalConfig.isJmxReportEnable(), globalConfig.isCsvReportEnable(),
-                globalConfig.getCsvUpdateInterval(), globalConfig.getCsvGaugeUpdateInterval());
+    PubSubConfig() {
+        id = UUID.randomUUID().toString();
     }
 
-    public PubSubConfig(PubSubConfig config) {
-        super(config.getUsername(), config.getPassword(),
-                config.getHostname(), config.getPort(),
-                config.getInitialContextFactory(), config.getConnectionFactoryPrefix(),
-                config.getConnectionFactoryName(), config.getClientID(),
-                config.getVirtualHostName(), config.getPrintPerMessages(),
-                config.isEnableConsoleReport(), config.getConsoleReportUpdateInterval(),
-                config.isJmxReportEnable(), config.isCsvReportEnable(),
-                config.getCsvUpdateInterval(), config.getCsvGaugeUpdateInterval());
-
-        messageCount = config.getMessageCount();
-        parallelPublishers = config.getParallelPublishers();
-        queueName = config.getQueueName();
-        id = config.getId();
-        isTransactional = config.isTransactional();
-        transactionBatchSize = config.getTransactionBatchSize();
-        failoverParams = config.getFailoverParams();
-        delayBetweenMsgs = config.getDelayBetweenMsgs();
-    }
-
-    void setMessageCount(long messageCount) {
-        this.messageCount = messageCount;
-    }
-
-    void setParallelPublishers(int parallelPublishers) {
-        this.parallelPublishers = parallelPublishers;
-    }
-
-    void setQueueName(String queueName) {
-        this.queueName = queueName;
-    }
-
-    public long getMessageCount() {
-        return messageCount;
-    }
-
-    public int getParallelPublishers() {
-        return parallelPublishers;
-    }
-
-    public String getQueueName() {
-        return queueName;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public boolean isTransactional() {
-        return isTransactional;
-    }
-
-    public String getFailoverParams() {
-        return failoverParams;
-    }
-
-    public void setFailoverParams(String failoverParams) {
-        this.failoverParams = failoverParams;
-    }
-
-    public void setTransactional(boolean isTransactional) {
-        this.isTransactional = isTransactional;
-    }
-
-    public int getTransactionBatchSize() {
-        return transactionBatchSize;
-    }
-
-    public void setTransactionBatchSize(int transactionBatchSize) {
-        this.transactionBatchSize = transactionBatchSize;
+    void addGlobalConfigurationsIfAbsent(TestConfiguration tc) {
+        if(port == 0){
+            setPort(tc.getPort());
+        }
+        if(StringUtils.isBlank(getHostname())) {
+            setHostname(tc.getHostname());
+        }
+        if(StringUtils.isBlank(getUsername())) {
+            setUsername(tc.getUsername());
+        }
+        if (StringUtils.isBlank(getPassword())) {
+            setPassword(tc.getPassword());
+        }
+        if (StringUtils.isBlank(getInitialContextFactory())) {
+            setInitialContextFactory(tc.getInitialContextFactory());
+        }
+        if (StringUtils.isBlank(getConnectionFactoryPrefix())) {
+            setConnectionFactoryPrefix(tc.getConnectionFactoryPrefix());
+        }
+        if (StringUtils.isBlank(getConnectionFactoryName())) {
+            setConnectionFactoryName(tc.getConnectionFactoryName());
+        }
+        if (StringUtils.isBlank(getClientID())) {
+            setClientID(tc.getClientID());
+        }
+        if(StringUtils.isBlank(getVirtualHostName())) {
+            setVirtualHostName(tc.getVirtualHostName());
+        }
     }
 
     public String getTCPConnectionURL() {
@@ -131,11 +112,158 @@ public abstract class PubSubConfig extends GlobalConfig{
         return builder.toString();
     }
 
+    public int getPort() {
+        return port;
+    }
+
+    void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    void setHostname(String hostname) {
+        this.hostname = hostname;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getInitialContextFactory() {
+        return initialContextFactory;
+    }
+
+    void setInitialContextFactory(String initialContextFactory) {
+        this.initialContextFactory = initialContextFactory;
+    }
+
+    public String getConnectionFactoryPrefix() {
+        return connectionFactoryPrefix;
+    }
+
+    void setConnectionFactoryPrefix(String connectionFactoryPrefix) {
+        this.connectionFactoryPrefix = connectionFactoryPrefix;
+    }
+
+    public String getConnectionFactoryName() {
+        return connectionFactoryName;
+    }
+
+    void setConnectionFactoryName(String connectionFactoryName) {
+        this.connectionFactoryName = connectionFactoryName;
+    }
+
+    public String getClientID() {
+        return clientID;
+    }
+
+    void setClientID(String clientID) {
+        this.clientID = clientID;
+    }
+
+    public String getVirtualHostName() {
+        return virtualHostName;
+    }
+
+    void setVirtualHostName(String virtualHostName) {
+        this.virtualHostName = virtualHostName;
+    }
+
+    public long getMessageCount() {
+        return messageCount;
+    }
+
+    void setMessageCount(long messageCount) {
+        this.messageCount = messageCount;
+    }
+
+    public String getQueueName() {
+        return queueName;
+    }
+
+    void setQueueName(String queueName) {
+        this.queueName = queueName;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    void setId(String id) {
+        this.id = id;
+    }
+
+    public boolean isTransactional() {
+        return isTransactional;
+    }
+
+    void setTransactional(boolean transactional) {
+        isTransactional = transactional;
+    }
+
+    public int getTransactionBatchSize() {
+        return transactionBatchSize;
+    }
+
+    void setTransactionBatchSize(int transactionBatchSize) {
+        this.transactionBatchSize = transactionBatchSize;
+    }
+
+    public String getFailoverParams() {
+        return failoverParams;
+    }
+
+    void setFailoverParams(String failoverParams) {
+        this.failoverParams = failoverParams;
+    }
+
     public int getDelayBetweenMsgs() {
         return delayBetweenMsgs;
     }
 
-    public void setDelayBetweenMsgs(int delayBetweenMsgs) {
+    void setDelayBetweenMsgs(int delayBetweenMsgs) {
         this.delayBetweenMsgs = delayBetweenMsgs;
     }
+
+    public int getParallelThreads() {
+        return parallelThreads;
+    }
+
+    public void setParallelThreads(int parallelThreads) {
+        this.parallelThreads = parallelThreads;
+    }
+
+    Object copyMembers(Object original, Object copy) throws NoSuchFieldException, IllegalAccessException {
+        for(Field originalsField: original.getClass().getDeclaredFields()) {
+            Field copyField = copy.getClass().getDeclaredField(originalsField.getName());
+            copyField(originalsField, copyField, original, copy);
+        }
+        for (Field originalsField: original.getClass().getSuperclass().getDeclaredFields()) {
+            Field copyField = copy.getClass().getSuperclass().getDeclaredField(originalsField.getName());
+            copyField(originalsField, copyField, original, copy);
+        }
+        return copy;
+    }
+
+    private void copyField(Field originalField, Field copyField, Object original, Object copy) throws IllegalAccessException {
+        originalField.setAccessible(true);
+        copyField.setAccessible(true);
+        copyField.set(copy, originalField.get(original));
+    }
 }
+

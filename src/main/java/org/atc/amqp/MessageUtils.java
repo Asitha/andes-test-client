@@ -29,6 +29,9 @@ import javax.jms.TextMessage;
  */
 public class MessageUtils {
 
+    private MessageUtils() {
+    }
+
     /**
      * Converts {@link javax.jms.Message} to an {@link org.atc.ATCMessage}
      * @param jmsMessage {@link javax.jms.Message} to be converted

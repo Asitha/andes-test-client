@@ -16,322 +16,97 @@
 
 package org.atc.config;
 
+import org.apache.commons.lang3.StringUtils;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.introspector.BeanAccess;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import static org.atc.Main.CONFIG_FILE_PATH;
 
 public class ConfigReader {
 
+    private ConfigReader() {
+    }
+
     public static final int RESEND_WAIT_INTERVAL_MILLISECONDS = 1000;
 
-    static final String HOSTNAME = "hostname";
-    static final String PORT = "port";
-    static final String USERNAME = "username";
-    static final String PASSWORD = "password";
-
-    static final String ICF = "initial_context_factory";
-    static final String CF_NAME_PREFIX = "connection_factory_name_prefix";
-    static final String CF_NAME = "connection_factory_name";
-    static final String CLIENT_ID = "client_id";
-    static final String VIRTUALHOST_NAME = "virtualhost_name";
-
-    static final String TRANSACTIONAL_CLIENT = "transaction_enable";
-    static final String TRANSACTION_BATCH_SIZE = "transaction_batch_size";
-
-    static final String TOPIC_PUBLISHERS = "topic_publishers";
-    static final String MESSAGE_COUNT = "message_count";
-    static final String PARALLEL_THREADS = "parallel_threads";
-    static final String SUBSCRIPTION_ID = "sub_id";
-    static final String PRINT_PER_MESSAGES = "print_per_messages";
-
-    static final String QUEUE_NAME = "queue_name";
-
-    static final String TOPIC_SUBSCRIBERS = "topic_subscribers";
-
-    static final String QUEUE_SUBSCRIBERS = "queue_subscribers";
-
-    static final String QUEUE_PUBLISHERS = "queue_publishers";
-
-    static final String DURABLE_SUBSCRIPTION = "durable_subscribers";
-
-    static final String FAILOVER_PARAMS = "failover_params";
-
-    static final String PUB_SUB_ID = "id";
-
-    static final String UNSUB_ON_FINISH = "unsubscribe_on_finish";
-
-    static final String DELAY_BETWEEN_MESSAGES = "delay_between_messages";
-
-    static final String CONSOLE_REPORT = "console_report_enable";
-
-    static final String CONSOLE_REPORT_UPDATE_INTERVAL = "console_report_update_interval_seconds";
-
-    static final String JMX_REPORT = "jmx_report_enable";
-
-    static final String CSV_REPORT = "csv_report_enable";
-
-    static final String CSV_UPDATE_INTERVAL = "csv_report_update_interval_seconds";
-
-    static final String CSV_GAUGE_UPDATE_INTERVAL = "csv_gauges_update_interval_milis";
-
-    public static TestConfiguration parseConfig(final String filePath) throws FileNotFoundException, CloneNotSupportedException {
+    public static TestConfiguration parseConfig(final String filePath) throws FileNotFoundException, NoSuchFieldException, IllegalAccessException {
 
         InputStream input = new FileInputStream(new File(filePath));
         Yaml yaml = new Yaml();
-        Map map = (Map) yaml.load(input);
+        yaml.setBeanAccess(BeanAccess.FIELD);
+        TestConfiguration testConfiguration = yaml.loadAs(input, TestConfiguration.class);
 
-        GlobalConfig globalConfig = new GlobalConfig(map.get(USERNAME), 
-                map.get(PASSWORD),
-                map.get(HOSTNAME), 
-                map.get(PORT),
-                map.get(ICF),
-                map.get(CF_NAME_PREFIX),
-                map.get(CF_NAME),
-                map.get(CLIENT_ID),
-                map.get(VIRTUALHOST_NAME),
-                map.get(PRINT_PER_MESSAGES),
-                map.get(CONSOLE_REPORT),
-                map.get(CONSOLE_REPORT_UPDATE_INTERVAL),
-                map.get(JMX_REPORT),
-                map.get(CSV_REPORT),
-                map.get(CSV_UPDATE_INTERVAL),
-                map.get(CSV_GAUGE_UPDATE_INTERVAL)
-        );
-
-        TestConfiguration testConfiguration = new TestConfiguration(globalConfig);
-
-        // configure publishers
-        List<PublisherConfig> publisherConfigList;
-        Object section = map.get(TOPIC_PUBLISHERS);
-        publisherConfigList = populatePublisherConfigs(section, globalConfig);
-        testConfiguration.addTopicPublisherList(publisherConfigList);
-        
-        section = map.get(QUEUE_PUBLISHERS);
-        publisherConfigList = populatePublisherConfigs(section, globalConfig);
-        testConfiguration.addQueuePublisherConfigList(publisherConfigList);
-        
-        // configure subscribers
-        List<SubscriberConfig> subscriberConfigList;        
-        section = map.get(TOPIC_SUBSCRIBERS);
-        subscriberConfigList = populateSubscriberConfigs(section,globalConfig);
-        testConfiguration.addTopicSubscriberConfigList(subscriberConfigList);
-        
-        section = map.get(QUEUE_SUBSCRIBERS);
-        subscriberConfigList = populateSubscriberConfigs(section,globalConfig);
-        testConfiguration.addQueueSubscriberConfigList(subscriberConfigList);
-        
-        section = map.get(DURABLE_SUBSCRIPTION);
-        subscriberConfigList = populateSubscriberConfigs(section, globalConfig);
-        testConfiguration.addDurableSubscriberConfigList(subscriberConfigList);
+        preProcessTopicPublishers(testConfiguration);
+        preProcessQueuePublishers(testConfiguration);
+        preProcessTopicSubscribers(testConfiguration);
+        preProcessQueueSubscribers(testConfiguration);
+        preProcessDurableTopicSubscribers(testConfiguration);
 
         return testConfiguration;
     }
-    
-    private static List<SubscriberConfig> populateSubscriberConfigs(Object section, GlobalConfig globalConfig) throws CloneNotSupportedException {
 
-        List<SubscriberConfig> subscriberConfigsList;
-        if (null != section) {
-            List subscriberList = (List) section;
-            subscriberConfigsList = new ArrayList<SubscriberConfig>(subscriberList.size());
-            for (Object subscriber : subscriberList) {
-                Map subscriberInfo = (Map) subscriber;
-                SubscriberConfig subscriberConfig = new SubscriberConfig(globalConfig);
-
-                updateGlobalConfigs(subscriberInfo, subscriberConfig);
-                populatePubSubConfigs(subscriberInfo, subscriberConfig);
-                
-                Object val = subscriberInfo.get(SUBSCRIPTION_ID);
-                if(null != val) {
-                    String subID;
-                    if (val instanceof Integer) {
-                        subID = val.toString();
-                    } else if (val instanceof Long) {
-                        subID = val.toString();
-                    } else {
-                        subID = val.toString();
-                    }
-                    subscriberConfig.setSubscriptionID(subID);
-                }
-
-                val = subscriberInfo.get(UNSUB_ON_FINISH);
-                if(null != val) {
-                    if (val instanceof Boolean) {
-                        subscriberConfig.setUnsubOnFinish((Boolean)val);
-                    } else {
-                        throw new IllegalArgumentException("Boolean value expected for " + UNSUB_ON_FINISH +
-                                "found " + val + "[ " + val.getClass() + " ]");
-                    }
-                }
-                
-                subscriberConfigsList.add(subscriberConfig);
-
-                for (int i = 1; i < subscriberConfig.getParallelPublishers(); i++) {
-                    SubscriberConfig s = subscriberConfig.newSubscriberConfig(
-                            subscriberConfig.getId() + "-" + Integer.toString(i));
-                    subscriberConfigsList.add(s);
-                }
-            }
-        } else {
-            subscriberConfigsList = new ArrayList<SubscriberConfig>(0);
+    private static void addGlobalConfigerationsIfAbsent(TestConfiguration tc, List pubsubList) {
+        for(Object obj: pubsubList) {
+            PubSubConfig pubSubConfig = (PubSubConfig) obj ;
+            pubSubConfig.addGlobalConfigurationsIfAbsent(tc);
         }
-        return subscriberConfigsList;
-    }
-    
-    private static List<PublisherConfig> populatePublisherConfigs(Object section, GlobalConfig globalConfig) {
-        List<PublisherConfig> publisherConfigList;
-        if (null != section) {
-            List publisherList = (List) section;
-            publisherConfigList = new ArrayList<PublisherConfig>(publisherList.size());
-            for (Object publisher : publisherList) {
-                Map publisherInfo = (Map) publisher;
-                PublisherConfig publisherConfig = new PublisherConfig(globalConfig);
-
-                updateGlobalConfigs(publisherInfo, publisherConfig);
-                populatePubSubConfigs(publisherInfo, publisherConfig);
-                publisherConfigList.add(publisherConfig);
-
-                for (int i = 1; i < publisherConfig.getParallelPublishers(); i++) {
-                    PublisherConfig p = publisherConfig.newPublisherConfig(publisherConfig.getId() +
-                            "-" + Integer.toString(i));
-                    publisherConfigList.add(p);
-                }
-            }
-        } else {
-            publisherConfigList = new ArrayList<PublisherConfig>(0);
-        }
-        
-        return publisherConfigList;
     }
 
-    private static void populatePubSubConfigs(Map yamlSection, PubSubConfig pubSubConfig) {
+    private static void preProcessDurableTopicSubscribers(TestConfiguration tc) throws NoSuchFieldException, IllegalAccessException {
+        addGlobalConfigerationsIfAbsent(tc, tc.getDurableTopicSubscribers());
+        createDuplicateSubscribersIfNeeded(tc.getDurableTopicSubscribers());
+    }
 
-        Object value = yamlSection.get(MESSAGE_COUNT);
+    private static void preProcessQueueSubscribers(TestConfiguration tc) throws NoSuchFieldException, IllegalAccessException {
+        addGlobalConfigerationsIfAbsent(tc, tc.getQueueSubscribers());
+        createDuplicateSubscribersIfNeeded(tc.getQueueSubscribers());
+    }
 
-        if (null == value) {
-            throw new IllegalArgumentException(MESSAGE_COUNT + " should be non empty in configuration file " + CONFIG_FILE_PATH);
-        }
+    private static void preProcessTopicSubscribers(TestConfiguration tc) throws NoSuchFieldException, IllegalAccessException {
+        addGlobalConfigerationsIfAbsent(tc, tc.getTopicSubscribers());
+        createDuplicateSubscribersIfNeeded(tc.getTopicSubscribers());
+    }
 
-        if (value instanceof Integer) {
-            pubSubConfig.setMessageCount((Integer) value);
-        } else if (value instanceof Long) {
-            pubSubConfig.setMessageCount((Long) value);
-        } else {
-            throw new IllegalArgumentException(MESSAGE_COUNT + " type " + value.getClass()
-                    + " not valid in configuration file " + CONFIG_FILE_PATH);
-        }
+    private static void preProcessQueuePublishers(TestConfiguration tc) throws NoSuchFieldException, IllegalAccessException {
+        addGlobalConfigerationsIfAbsent(tc, tc.getQueuePublishers());
+        createDuplicatePublishersIfNeeded(tc.getQueuePublishers());
+    }
 
-        value = yamlSection.get(QUEUE_NAME);
-        if(value == null) {
-            throw new IllegalArgumentException(QUEUE_NAME + " should be set for publisher in configuration " + CONFIG_FILE_PATH);
-        } else {
-            pubSubConfig.setQueueName(value.toString());
-        }
-        
-        value = yamlSection.get(PARALLEL_THREADS);
-        if (null != value) {
-            pubSubConfig.setParallelPublishers((Integer) value);
-        } else {
-            pubSubConfig.setParallelPublishers(1); // defaults to 1 publisher
-        }
+    private static void preProcessTopicPublishers(TestConfiguration tc) throws NoSuchFieldException, IllegalAccessException {
+        addGlobalConfigerationsIfAbsent(tc, tc.getTopicPublishers());
+        createDuplicatePublishersIfNeeded(tc.getTopicPublishers());
+    }
 
-        value= yamlSection.get(PUB_SUB_ID);
-        if(null != value) {
-            pubSubConfig.setId(value.toString());
-        } else {
-            pubSubConfig.setId(UUID.randomUUID().toString());
-        }
-
-        value = yamlSection.get(FAILOVER_PARAMS);
-        if (null != value) {
-            pubSubConfig.setFailoverParams(value.toString());
-        }
-
-        value = yamlSection.get(TRANSACTIONAL_CLIENT);
-        if(null != value) {
-            pubSubConfig.setTransactional((Boolean)value);
-        } else {
-            pubSubConfig.setTransactional(false);
-        }
-
-        value = yamlSection.get(TRANSACTION_BATCH_SIZE);
-        if(null != value) {
-            pubSubConfig.setTransactionBatchSize((Integer)value);
-        } else {
-            pubSubConfig.setTransactionBatchSize(1); // default
-        }
-
-        value = yamlSection.get(DELAY_BETWEEN_MESSAGES);
-        if (null != value) {
-            if(value instanceof Integer ) {
-                pubSubConfig.setDelayBetweenMsgs((Integer)value);
-            } else {
-                throw new IllegalArgumentException("Expects an type Integer for " + DELAY_BETWEEN_MESSAGES +
-                        ". Found " + value + " [ " + value.getClass() +" ]" );
+    private static void createDuplicateSubscribersIfNeeded(List<SubscriberConfig> subscriberConfigList) throws NoSuchFieldException, IllegalAccessException {
+        int startPos = subscriberConfigList.size() - 1;
+        for (int i = startPos; i > -1; i--) {
+            SubscriberConfig sc = subscriberConfigList.get(i);
+            int copyCount = sc.getParallelThreads() - 1; // minus the current copy
+            for (int j = 0; j < copyCount; j++) {
+                SubscriberConfig copy = sc.copy();
+                copy.setId(sc.getId() + "__" + (j+2));
+                if(StringUtils.isNotBlank(sc.getSubscriptionID())) {
+                    copy.setSubscriptionID(sc.getSubscriptionID() + "__" + (j+2));
+                }
+                subscriberConfigList.add(copy);
             }
         }
     }
 
-    private static void updateGlobalConfigs(Map yamlSection, GlobalConfig config) {
-
-        Object value = yamlSection.get(HOSTNAME);
-        if (null != value) {
-            config.setHostname(value);
-        }
-        value = yamlSection.get(PORT);
-        if (null != value) {
-            config.setPort(value);
-        }
-        value = yamlSection.get(USERNAME);
-        if (null != value) {
-            config.setUsername(value);
-        }
-
-        value = yamlSection.get(PASSWORD);
-        if (null != value) {
-            config.setPassword(value);
-        }
-        
-        value = yamlSection.get(ICF);
-        if (null != value) {
-            config.setInitialContextFactory(value);
-        }
-        value = yamlSection.get(CF_NAME_PREFIX);
-        if (null != value) {
-            config.setConnectionFactoryPrefix(value);
-        }
-        value = yamlSection.get(CF_NAME);
-        if (null != value) {
-            config.setConnectionFactoryName(value);
-        }
-
-        value = yamlSection.get(CLIENT_ID);
-        if (null != value) {
-            config.setClientID(value);
-        }
-
-        value = yamlSection.get(VIRTUALHOST_NAME);
-        if (null != value) {
-            config.setVirtualHostName(value);
-        }
-
-        value = yamlSection.get(PRINT_PER_MESSAGES);
-        if(null != value) {
-            if( value instanceof Integer) {
-                config.setPrintPerMessages(value);
-            } else {
-                throw new IllegalArgumentException("Value for " + PRINT_PER_MESSAGES + " require type Integer. Found " +
-                        " type " + value.getClass());
+    private static void createDuplicatePublishersIfNeeded(List<PublisherConfig> publisherList) throws NoSuchFieldException, IllegalAccessException {
+        int startPos = publisherList.size() - 1;
+        for (int i = startPos; i > -1; i--) {
+            PublisherConfig sc = publisherList.get(i);
+            int copyCount = sc.getParallelThreads() - 1; // minus the current copy
+            for (int j = 0; j < copyCount; j++) {
+                PublisherConfig copy = sc.copy();
+                copy.setId(sc.getId() + "__" + (j+2));
+                publisherList.add(copy);
             }
         }
     }
-
 }

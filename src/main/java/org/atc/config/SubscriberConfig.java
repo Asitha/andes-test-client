@@ -16,14 +16,18 @@
 
 package org.atc.config;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+
+@SuppressWarnings("unused")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SubscriberConfig extends PubSubConfig {
-    
+
+    @XmlAttribute
     private String subscriptionID;
-    private boolean unsubOnFinish;
-    
-    public SubscriberConfig(GlobalConfig globalConfig) {
-        super(globalConfig);
-    }
+    @XmlAttribute
+    private boolean unsubscribeOnFinish;
 
     void setSubscriptionID(String subscriptionID) {
         this.subscriptionID = subscriptionID;
@@ -33,23 +37,17 @@ public class SubscriberConfig extends PubSubConfig {
         return subscriptionID;
     }
 
-    @Override
-    public SubscriberConfig clone() throws CloneNotSupportedException {
-        super.clone();
-        return new SubscriberConfig(this);
+    public boolean isUnsubscribeOnFinish() {
+        return unsubscribeOnFinish;
     }
 
-    public SubscriberConfig newSubscriberConfig(String id) {
-        SubscriberConfig s = new SubscriberConfig(this);
-        s.setId(id);
-        return s;
+    void setUnsubscribeOnFinish(boolean unsubscribeOnFinish) {
+        this.unsubscribeOnFinish = unsubscribeOnFinish;
     }
 
-    public boolean isUnsubOnFinish() {
-        return unsubOnFinish;
-    }
-
-    public void setUnsubOnFinish(boolean unsubOnFinish) {
-        this.unsubOnFinish = unsubOnFinish;
+    SubscriberConfig copy() throws NoSuchFieldException, IllegalAccessException {
+        SubscriberConfig copy = new SubscriberConfig();
+        copyMembers(this, copy);
+        return copy;
     }
 }

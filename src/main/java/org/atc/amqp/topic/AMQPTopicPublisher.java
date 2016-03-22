@@ -24,7 +24,6 @@ import org.atc.amqp.MessageUtils;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.QueueSession;
 import javax.jms.Topic;
 import javax.jms.TopicConnection;
 import javax.jms.TopicConnectionFactory;
@@ -42,17 +41,15 @@ public class AMQPTopicPublisher implements SimplePublisher {
     private TopicConnection topicConnection;
     private PublisherConfig config;
 
-    @Override
-    public void send(ATCMessage message) throws ATCException {
+    public void send(ATCMessage atcMessage) throws ATCException {
         try {
-            Message m = MessageUtils.fromATCToJMS(topicSession, message);
+            Message m = MessageUtils.fromATCToJMS(topicSession, atcMessage);
             topicPublisher.send(m);
         } catch (JMSException e) {
             throw new ATCException("Error occurred while sending message. Publisher id" + config.getId(), e);
         }
     }
 
-    @Override
     public void commit() throws ATCException{
         try {
             topicSession.commit();
@@ -61,7 +58,6 @@ public class AMQPTopicPublisher implements SimplePublisher {
         }
     }
 
-    @Override
     public void rollback() throws ATCException {
         try {
             topicSession.rollback();
@@ -70,7 +66,6 @@ public class AMQPTopicPublisher implements SimplePublisher {
         }
     }
 
-    @Override
     public void init(PublisherConfig conf) throws NamingException, ATCException {
 
         try {
@@ -91,10 +86,10 @@ public class AMQPTopicPublisher implements SimplePublisher {
             if (conf.isTransactional()) {
                 topicSession = topicConnection.createTopicSession(true, 0);
             } else {
-                topicSession = topicConnection.createTopicSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+                topicSession = topicConnection.createTopicSession(false, TopicSession.AUTO_ACKNOWLEDGE);
             }
             Topic topic = (Topic) ctx.lookup(conf.getQueueName());
-//        Topic topic = topicSession.createTopic(config.getQueueName());
+//            Topic topic = topicSession.createTopic(config.getQueueName());
             // create the message to send
             topicPublisher = topicSession.createPublisher(topic);
         } catch (JMSException jmse) {
@@ -102,17 +97,14 @@ public class AMQPTopicPublisher implements SimplePublisher {
         }
     }
 
-    @Override
     public ATCMessage createTextMessage(String text) throws ATCException {
         return new ATCMessage(text);
     }
 
-    @Override
     public PublisherConfig getConfigs() {
         return config;
     }
 
-    @Override
     public void close() throws ATCException {
         try {
             topicPublisher.close();

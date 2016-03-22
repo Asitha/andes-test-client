@@ -25,7 +25,6 @@ import org.atc.amqp.MessageUtils;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
-import javax.jms.QueueSession;
 import javax.jms.Topic;
 import javax.jms.TopicConnection;
 import javax.jms.TopicConnectionFactory;
@@ -42,9 +41,7 @@ public class AMQPTopicSubscriber implements SimpleConsumer {
     private TopicSession topicSession;
     private TopicSubscriber topicSubscriber;
     private SubscriberConfig config;
-    long messageCount;
 
-    @Override
     public MessageConsumer subscribe(SubscriberConfig config) throws NamingException, ATCException {
 
         try {
@@ -58,12 +55,11 @@ public class AMQPTopicSubscriber implements SimpleConsumer {
             topicConnection = connFactory.createTopicConnection();
             topicConnection.start();
             topicSession =
-                    topicConnection.createTopicSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+                    topicConnection.createTopicSession(false, TopicSession.CLIENT_ACKNOWLEDGE);
             // Send message
             Topic topic = topicSession.createTopic(config.getQueueName());
             javax.jms.TopicSubscriber topicSubscriber = topicSession.createSubscriber(topic);
 
-            messageCount = config.getMessageCount();
             this.topicSubscriber = topicSubscriber;
             this.config = config;
             return topicSubscriber;
@@ -72,12 +68,10 @@ public class AMQPTopicSubscriber implements SimpleConsumer {
         }
     }
 
-    @Override
     public SubscriberConfig getConfigs() {
         return config;
     }
 
-    @Override
     public ATCMessage receive() throws ATCException {
         try {
             Message message = topicSubscriber.receive();
@@ -88,7 +82,6 @@ public class AMQPTopicSubscriber implements SimpleConsumer {
         }
     }
 
-    @Override
     public void close() throws ATCException {
         try {
             topicSubscriber.close();
@@ -99,7 +92,6 @@ public class AMQPTopicSubscriber implements SimpleConsumer {
         }
     }
 
-    @Override
     public void unsubscribe() {
     }
 

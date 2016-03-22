@@ -32,7 +32,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 public class ConsumerThread implements Runnable {
 
-    SimpleConsumer consumer;
+    private SimpleConsumer consumer;
     private static Log log = LogFactory.getLog(ConsumerThread.class);
     private final Histogram latencyHist;
     private final Meter consumerRate;
@@ -63,7 +63,6 @@ public class ConsumerThread implements Runnable {
                 name(ConsumerThread.class, this.consumer.getConfigs().getId(), "receiving-stats"),
                 new Gauge<Integer>() {
 
-            @Override
             public Integer getValue() {
                 int val = receivedCount.get();
                 receivedCount.addAndGet(-val);
@@ -75,8 +74,6 @@ public class ConsumerThread implements Runnable {
         this.globalLatencyHist = globalLatency;
     }
 
-
-    @Override
     public void run() {
 
         long messageCount = consumer.getConfigs().getMessageCount();
@@ -109,11 +106,11 @@ public class ConsumerThread implements Runnable {
             }
 
             log.info("Stopping consumer. [ Consumer ID: " + consumerID + "  ]");
-            if(consumer.getConfigs().isUnsubOnFinish()) {
+            if(consumer.getConfigs().isUnsubscribeOnFinish()) {
                 consumer.unsubscribe();
                 consumer.close();
                 log.info("Un-subscribing consumer for " + config.getQueueName() +
-                        " [ Consumer ID: " + consumerID + " ]");
+                        " [ Consumer ID:9 " + consumerID + " ]");
             } else {
                 consumer.close();
                 log.info("Consumer disconnected [ Consumer ID: " + consumerID + " ]");

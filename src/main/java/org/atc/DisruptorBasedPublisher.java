@@ -34,12 +34,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * This class is used to transactional message publishing
  */
-public class DisruptorBasedPublisher {
+class DisruptorBasedPublisher {
 
     private static Log log = LogFactory.getLog(DisruptorBasedPublisher.class);
 
     private Disruptor<PublishEvent> disruptor;
-    ExecutorService executorPool;
+    private ExecutorService executorPool;
     private static final int EXECUTOR_POOL_SHUTDOWN_WAIT_TIME = 10;
 
     DisruptorBasedPublisher(int batchSize, SimplePublisher publisher, AtomicInteger sentCount, Meter publishRate) {
@@ -48,7 +48,6 @@ public class DisruptorBasedPublisher {
                 .setNameFormat("Disruptor Publisher Thread. Publisher " +
                         publisher.getConfigs().getId()).build();
         executorPool = Executors.newCachedThreadPool(namedThreadFactory);
-
         int bufferSize = 4096;
 
         disruptor = new Disruptor<PublishEvent>(
@@ -64,14 +63,14 @@ public class DisruptorBasedPublisher {
 
     /**
      * Publish a message to disruptor (Eventually this will be published to broker)
-     * @param ATCMessage message to be published to disruptor
+     * @param atcMessage message to be published to disruptor
      */
-    void publish(ATCMessage ATCMessage) {
+    void publish(ATCMessage atcMessage) {
 
         RingBuffer<PublishEvent> ringBuffer = disruptor.getRingBuffer();
         long sequence = ringBuffer.next();
         PublishEvent evt = ringBuffer.get(sequence);
-        evt.setAtcMessage(ATCMessage);
+        evt.setAtcMessage(atcMessage);
         evt.setType(PublishEvent.EventType.MessageEvent);
         ringBuffer.publish(sequence);
 
@@ -99,7 +98,7 @@ public class DisruptorBasedPublisher {
      * Shuts down disruptor after processing all pending events. If new events were published disruptor will
      * wait for them to finish as well.
      */
-    public void shutdown() {
+    void shutdown() {
         disruptor.shutdown();
         executorPool.shutdown();
         try {

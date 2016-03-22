@@ -22,7 +22,7 @@ import com.lmax.disruptor.EventFactory;
  * Used by {@link com.lmax.disruptor.dsl.Disruptor} to handle transactional publishing. This is
  * the container for the publish events
  */
-public class PublishEvent {
+class PublishEvent {
 
     enum EventType {
 
@@ -40,37 +40,36 @@ public class PublishEvent {
     private ATCMessage atcMessage;
     private EventType type;
 
-    public ATCMessage getAtcMessage() {
+    ATCMessage getAtcMessage() {
         return atcMessage;
     }
 
-    public void setAtcMessage(ATCMessage atcMessage) {
+    void setAtcMessage(ATCMessage atcMessage) {
         this.atcMessage = atcMessage;
     }
 
-    public EventType getType() {
+    EventType getType() {
         return type;
     }
 
-    public void setType(EventType type) {
+    void setType(EventType type) {
         this.type = type;
     }
 
-    public static class PublishEventFactory implements EventFactory<PublishEvent> {
-
-        @Override
-        public PublishEvent newInstance() {
-            return new PublishEvent();
-        }
-    }
-
-    public static EventFactory<PublishEvent> getFactory() {
+    static EventFactory<PublishEvent> getFactory() {
         return new PublishEventFactory();
     }
 
-    public void clear() {
+    void clear() {
         atcMessage = null;
         type = null;
+    }
+
+    public static class PublishEventFactory implements EventFactory<PublishEvent> {
+        public PublishEvent newInstance() {
+            return new PublishEvent();
+        }
+
     }
 
 }

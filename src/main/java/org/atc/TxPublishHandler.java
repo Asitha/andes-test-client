@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Transactional publish handler dor {@link org.atc.DisruptorBasedPublisher}
  */
-public class TxPublishHandler implements EventHandler<PublishEvent> {
+class TxPublishHandler implements EventHandler<PublishEvent> {
 
     private static Log log = LogFactory.getLog(TxPublishHandler.class);
 
@@ -47,14 +47,13 @@ public class TxPublishHandler implements EventHandler<PublishEvent> {
      * @param publishRate Metrics publish rate calculating meter
      */
     TxPublishHandler(int batchSize, SimplePublisher publisher, AtomicInteger sentCount, Meter publishRate) {
-        messagesList = new ArrayList<ATCMessage>(batchSize);
+        messagesList = new ArrayList<>(batchSize);
         this.batchSize = batchSize;
         this.publisher = publisher;
         this.sentCount = sentCount;
         this.publishRate = publishRate;
     }
 
-    @Override
     public void onEvent(PublishEvent event, long sequence, boolean endOfBatch) throws ATCException {
 
         try {
@@ -91,13 +90,13 @@ public class TxPublishHandler implements EventHandler<PublishEvent> {
     /**
      * Try to resend failed messages
      */
-    public void resend() {
+    private void resend() {
 
         try {
             Thread.sleep(ConfigReader.RESEND_WAIT_INTERVAL_MILLISECONDS);
             publisher.rollback();
-            for (ATCMessage ATCMessage : messagesList) {
-                publisher.send(ATCMessage);
+            for (ATCMessage atcMessage : messagesList) {
+                publisher.send(atcMessage);
             }
 
             publisher.commit();
