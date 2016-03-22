@@ -42,8 +42,9 @@ public class AMQPTopicSubscriber implements SimpleConsumer {
     private TopicSubscriber topicSubscriber;
     private SubscriberConfig config;
 
-    public MessageConsumer subscribe(SubscriberConfig config) throws NamingException, ATCException {
+    public final MessageConsumer subscribe(SubscriberConfig config) throws NamingException, ATCException {
 
+        this.config = config;
         try {
             Properties properties = new Properties();
             properties.put(Context.INITIAL_CONTEXT_FACTORY, config.getInitialContextFactory());
@@ -58,21 +59,19 @@ public class AMQPTopicSubscriber implements SimpleConsumer {
                     topicConnection.createTopicSession(false, TopicSession.CLIENT_ACKNOWLEDGE);
             // Send message
             Topic topic = topicSession.createTopic(config.getQueueName());
-            javax.jms.TopicSubscriber topicSubscriber = topicSession.createSubscriber(topic);
+            this.topicSubscriber = topicSession.createSubscriber(topic);
 
-            this.topicSubscriber = topicSubscriber;
-            this.config = config;
             return topicSubscriber;
         } catch (JMSException jmse) {
             throw new ATCException("Subscriber initialisation failed. Subscriber id " + config.getId(), jmse);
         }
     }
 
-    public SubscriberConfig getConfigs() {
+    public final SubscriberConfig getConfigs() {
         return config;
     }
 
-    public ATCMessage receive() throws ATCException {
+    public final ATCMessage receive() throws ATCException {
         try {
             Message message = topicSubscriber.receive();
             return MessageUtils.fromJMSToATC(message);
@@ -82,7 +81,7 @@ public class AMQPTopicSubscriber implements SimpleConsumer {
         }
     }
 
-    public void close() throws ATCException {
+    public final void close() throws ATCException {
         try {
             topicSubscriber.close();
             topicSession.close();
@@ -92,7 +91,7 @@ public class AMQPTopicSubscriber implements SimpleConsumer {
         }
     }
 
-    public void unsubscribe() {
+    public final void unsubscribe() {
     }
 
 }

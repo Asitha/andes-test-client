@@ -26,7 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 
-public class ConfigReader {
+public final class ConfigReader {
 
     private ConfigReader() {
     }

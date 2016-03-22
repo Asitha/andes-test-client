@@ -51,12 +51,12 @@ import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-public class Main {
+public final class Main {
 
     private static Log log = LogFactory.getLog(Main.class);
 
-    static final MetricRegistry metrics = new MetricRegistry();
-    static final MetricRegistry gauges = new MetricRegistry();
+    static final MetricRegistry METRICS = new MetricRegistry();
+    static final MetricRegistry GAUGES = new MetricRegistry();
 
     private static ConsoleReporter reporter;
     private static JmxReporter jmxReporter;
@@ -74,10 +74,10 @@ public class Main {
         CommandLineParser parser = new BasicParser();
         CommandLine cmd = parser.parse(options, args, false);
 
-        Histogram latencyHist = Main.metrics.histogram(
+        Histogram latencyHist = Main.METRICS.histogram(
                 name("global", "consumer", "latency")
         );
-        Meter consumerRate = Main.metrics.meter(
+        Meter consumerRate = Main.METRICS.meter(
                 name("global", "consumer", "rate"));
 
 
@@ -181,20 +181,20 @@ public class Main {
 
     private static void startStatReporting(TestConfiguration config) {
         // console reporter is created by default to provide a report when shutting down
-        reporter = ConsoleReporter.forRegistry(metrics)
+        reporter = ConsoleReporter.forRegistry(METRICS)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .build();
 
-        csvGaugeReporter = CsvReporter.forRegistry(gauges)
+        csvGaugeReporter = CsvReporter.forRegistry(GAUGES)
                 .formatFor(Locale.US)
                 .convertRatesTo(TimeUnit.MILLISECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .build(new File(System.getProperty("user.dir") + "/logs/metrics"));
         csvGaugeReporter.start(config.getCsvGaugeUpdateInterval(), TimeUnit.MILLISECONDS);
 
-        slf4jReporter = Slf4jReporter.forRegistry(metrics)
-                .outputTo(LoggerFactory.getLogger("com.example.metrics"))
+        slf4jReporter = Slf4jReporter.forRegistry(METRICS)
+                .outputTo(LoggerFactory.getLogger("com.example.METRICS"))
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .build();
@@ -207,7 +207,7 @@ public class Main {
 
         if(config.isJmxReportEnable()) {
             log.info("JMX reporting enabled.");
-            jmxReporter = JmxReporter.forRegistry(metrics).build();
+            jmxReporter = JmxReporter.forRegistry(METRICS).build();
             jmxReporter.start();
         }
 
@@ -218,7 +218,7 @@ public class Main {
     }
 
     private static void startCSVReport(int csvReportRefreshRate) {
-        csvReporter = CsvReporter.forRegistry(metrics)
+        csvReporter = CsvReporter.forRegistry(METRICS)
                 .formatFor(Locale.US)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)

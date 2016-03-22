@@ -31,30 +31,30 @@ queuePublishers:
      transactionBatchSize: 50
      parallelThreads: 1
 
-topicPublishers:
-   - queueName: games
-     messageCount: 1
+#topicPublishers:
+#   - queueName: games
+#     messageCount: 1
      # failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
 
 ## Subscribers
 
 queueSubscribers:
   - queueName: games
-    messageCount: 30000
+    messageCount: 10000
     parallelThreads: 1
 
-topicSubscribers:
-  - queueName: Queue
-    messageCount: 156
+#topicSubscribers:
+#  - queueName: Queue
+#    messageCount: 156
 
 
-durableTopicSubscribers:
-  - queueName: games
-    id: genId
-    messageCount: 10000
-    subscriptionID: subId
-    unsubscribeOnFinish: true
-    parallelThreads: 5
+#durableTopicSubscribers:
+#  - queueName: games
+#    id: genId
+#    messageCount: 10000
+#    subscriptionID: subId
+#    unsubscribeOnFinish: true
+#    parallelThreads: 5
 
 ## End of subscriber configurations
 

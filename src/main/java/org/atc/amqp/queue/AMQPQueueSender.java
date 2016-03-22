@@ -41,7 +41,7 @@ public class AMQPQueueSender implements SimplePublisher {
     private QueueSender queueSender;
     private PublisherConfig config;
 
-    public void init(PublisherConfig conf) throws NamingException, ATCException {
+    public final void init(PublisherConfig conf) throws NamingException, ATCException {
         try {
             String queueName = conf.getQueueName();
             Properties properties = new Properties();
@@ -67,11 +67,11 @@ public class AMQPQueueSender implements SimplePublisher {
         }
     }
 
-    public ATCMessage createTextMessage(String text) throws ATCException {
+    public final ATCMessage createTextMessage(String text) throws ATCException {
         return new ATCMessage(text);
     }
 
-    public void send(ATCMessage atcMessage) throws ATCException {
+    public final void send(ATCMessage atcMessage) throws ATCException {
         try {
             Message m = MessageUtils.fromATCToJMS(queueSession, atcMessage);
             queueSender.send(m);
@@ -80,7 +80,7 @@ public class AMQPQueueSender implements SimplePublisher {
         }
     }
 
-    public void commit() throws ATCException{
+    public final void commit() throws ATCException {
         try {
             queueSession.commit();
         } catch (JMSException e) {
@@ -88,7 +88,7 @@ public class AMQPQueueSender implements SimplePublisher {
         }
     }
 
-    public void rollback() throws ATCException {
+    public final void rollback() throws ATCException {
         try {
             queueSession.rollback();
         } catch (JMSException e) {
@@ -96,15 +96,15 @@ public class AMQPQueueSender implements SimplePublisher {
         }
     }
 
-    public PublisherConfig getConfigs() {
+    public final PublisherConfig getConfigs() {
         return config;
     }
 
-    public void close() throws ATCException {
+    public final void close() throws ATCException {
         try {
             queueSender.close();
             queueSession.close();
-//            queueConnection.close();
+            queueConnection.close();
         } catch (JMSException e) {
             throw new ATCException("Exception occurred while closing publisher " + config.getId(), e);
 

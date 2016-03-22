@@ -98,171 +98,171 @@ public class TestConfiguration {
         queueSubscribers = new ArrayList<>();
     }
 
-    public int getPort() {
+    public final int getPort() {
         return port;
     }
 
-    public void setPort(int port) {
+    public final void setPort(int port) {
         this.port = port;
     }
 
-    public String getHostname() {
+    public final String getHostname() {
         return hostname;
     }
 
-    public void setHostname(String hostname) {
+    public final void setHostname(String hostname) {
         this.hostname = hostname;
     }
 
-    public String getUsername() {
+    public final String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
+    public final void setUsername(String username) {
         this.username = username;
     }
 
-    public String getPassword() {
+    public final String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public final void setPassword(String password) {
         this.password = password;
     }
 
-    public String getInitialContextFactory() {
+    public final String getInitialContextFactory() {
         return initialContextFactory;
     }
 
-    public void setInitialContextFactory(String initialContextFactory) {
+    public final void setInitialContextFactory(String initialContextFactory) {
         this.initialContextFactory = initialContextFactory;
     }
 
-    public String getConnectionFactoryPrefix() {
+    public final String getConnectionFactoryPrefix() {
         return connectionFactoryPrefix;
     }
 
-    public void setConnectionFactoryPrefix(String connectionFactoryPrefix) {
+    public final void setConnectionFactoryPrefix(String connectionFactoryPrefix) {
         this.connectionFactoryPrefix = connectionFactoryPrefix;
     }
 
-    public String getConnectionFactoryName() {
+    public final String getConnectionFactoryName() {
         return connectionFactoryName;
     }
 
-    public void setConnectionFactoryName(String connectionFactoryName) {
+    public final void setConnectionFactoryName(String connectionFactoryName) {
         this.connectionFactoryName = connectionFactoryName;
     }
 
-    public String getClientID() {
+    public final String getClientID() {
         return clientID;
     }
 
-    public void setClientID(String clientID) {
+    public final void setClientID(String clientID) {
         this.clientID = clientID;
     }
 
-    public String getVirtualHostName() {
+    public final String getVirtualHostName() {
         return virtualHostName;
     }
 
-    public void setVirtualHostName(String virtualHostName) {
+    public final void setVirtualHostName(String virtualHostName) {
         this.virtualHostName = virtualHostName;
     }
 
-    public int getPrintPerMessages() {
+    public final int getPrintPerMessages() {
         return printPerMessages;
     }
 
-    public void setPrintPerMessages(int printPerMessages) {
+    public final void setPrintPerMessages(int printPerMessages) {
         this.printPerMessages = printPerMessages;
     }
 
-    public boolean isEnableConsoleReport() {
+    public final boolean isEnableConsoleReport() {
         return enableConsoleReport;
     }
 
-    public void setEnableConsoleReport(boolean enableConsoleReport) {
+    public final void setEnableConsoleReport(boolean enableConsoleReport) {
         this.enableConsoleReport = enableConsoleReport;
     }
 
-    public boolean isJmxReportEnable() {
+    public final boolean isJmxReportEnable() {
         return jmxReportEnable;
     }
 
-    public void setJmxReportEnable(boolean jmxReportEnable) {
+    public final void setJmxReportEnable(boolean jmxReportEnable) {
         this.jmxReportEnable = jmxReportEnable;
     }
 
-    public boolean isCsvReportEnable() {
+    public final boolean isCsvReportEnable() {
         return csvReportEnable;
     }
 
-    public void setCsvReportEnable(boolean csvReportEnable) {
+    public final void setCsvReportEnable(boolean csvReportEnable) {
         this.csvReportEnable = csvReportEnable;
     }
 
-    public int getConsoleReportUpdateInterval() {
+    public final int getConsoleReportUpdateInterval() {
         return consoleReportUpdateInterval;
     }
 
-    public void setConsoleReportUpdateInterval(int consoleReportUpdateInterval) {
+    public final void setConsoleReportUpdateInterval(int consoleReportUpdateInterval) {
         this.consoleReportUpdateInterval = consoleReportUpdateInterval;
     }
 
-    public int getCsvUpdateInterval() {
+    public final int getCsvUpdateInterval() {
         return csvUpdateInterval;
     }
 
-    public void setCsvUpdateInterval(int csvUpdateInterval) {
+    public final void setCsvUpdateInterval(int csvUpdateInterval) {
         this.csvUpdateInterval = csvUpdateInterval;
     }
 
-    public int getCsvGaugeUpdateInterval() {
+    public final int getCsvGaugeUpdateInterval() {
         return csvGaugeUpdateInterval;
     }
 
-    public void setCsvGaugeUpdateInterval(int csvGaugeUpdateInterval) {
+    public final void setCsvGaugeUpdateInterval(int csvGaugeUpdateInterval) {
         this.csvGaugeUpdateInterval = csvGaugeUpdateInterval;
     }
 
-    public List<PublisherConfig> getTopicPublishers() {
+    public final List<PublisherConfig> getTopicPublishers() {
         return topicPublishers;
     }
 
-    public void setTopicPublishers(List<PublisherConfig> topicPublishers) {
+    public final void setTopicPublishers(List<PublisherConfig> topicPublishers) {
         this.topicPublishers = topicPublishers;
     }
 
-    public List<PublisherConfig> getQueuePublishers() {
+    public final List<PublisherConfig> getQueuePublishers() {
         return queuePublishers;
     }
 
-    public void setQueuePublishers(List<PublisherConfig> queuePublishers) {
+    public final void setQueuePublishers(List<PublisherConfig> queuePublishers) {
         this.queuePublishers = queuePublishers;
     }
 
-    public List<SubscriberConfig> getQueueSubscribers() {
+    public final List<SubscriberConfig> getQueueSubscribers() {
         return queueSubscribers;
     }
 
-    public void setQueueSubscribers(List<SubscriberConfig> queueSubscribers) {
+    public final void setQueueSubscribers(List<SubscriberConfig> queueSubscribers) {
         this.queueSubscribers = queueSubscribers;
     }
 
-    public List<SubscriberConfig> getTopicSubscribers() {
+    public final List<SubscriberConfig> getTopicSubscribers() {
         return topicSubscribers;
     }
 
-    public void setTopicSubscribers(List<SubscriberConfig> topicSubscribers) {
+    public final void setTopicSubscribers(List<SubscriberConfig> topicSubscribers) {
         this.topicSubscribers = topicSubscribers;
     }
 
-    public List<SubscriberConfig> getDurableTopicSubscribers() {
+    public final List<SubscriberConfig> getDurableTopicSubscribers() {
         return durableTopicSubscribers;
     }
 
-    public void setDurableTopicSubscribers(List<SubscriberConfig> durableTopicSubscribers) {
+    public final void setDurableTopicSubscribers(List<SubscriberConfig> durableTopicSubscribers) {
         this.durableTopicSubscribers = durableTopicSubscribers;
     }
 }

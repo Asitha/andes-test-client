@@ -29,23 +29,23 @@ public class SubscriberConfig extends PubSubConfig {
     @XmlAttribute
     private boolean unsubscribeOnFinish;
 
-    void setSubscriptionID(String subscriptionID) {
+    final void setSubscriptionID(String subscriptionID) {
         this.subscriptionID = subscriptionID;
     }
 
-    public String getSubscriptionID() {
+    public final String getSubscriptionID() {
         return subscriptionID;
     }
 
-    public boolean isUnsubscribeOnFinish() {
+    public final boolean isUnsubscribeOnFinish() {
         return unsubscribeOnFinish;
     }
 
-    void setUnsubscribeOnFinish(boolean unsubscribeOnFinish) {
+    final void setUnsubscribeOnFinish(boolean unsubscribeOnFinish) {
         this.unsubscribeOnFinish = unsubscribeOnFinish;
     }
 
-    SubscriberConfig copy() throws NoSuchFieldException, IllegalAccessException {
+    final SubscriberConfig copy() throws NoSuchFieldException, IllegalAccessException {
         SubscriberConfig copy = new SubscriberConfig();
         copyMembers(this, copy);
         return copy;

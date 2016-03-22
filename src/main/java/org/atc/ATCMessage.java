@@ -29,6 +29,7 @@ public class ATCMessage {
 
     /**
      * A{@link org.atc.ATCMessage} created with content set
+     *
      * @param text Content as {@link java.lang.String}
      */
     public ATCMessage(String text) {
@@ -43,58 +44,64 @@ public class ATCMessage {
 
     /**
      * Time the message sent from publisher is returned
+     *
      * @return Time the message was sent from publisher
      */
-    public long getTimeStamp() {
+    public final long getTimeStamp() {
         return timestamp;
     }
 
     /**
      * Time the message was sent from publisher should be set with this method
+     *
      * @param timeStamp Time the message was sent from publisher
      */
-    public void setTimeStamp(long timeStamp) {
+    public final void setTimeStamp(long timeStamp) {
         this.timestamp = timeStamp;
     }
 
     /**
      * Payload (content) of the message is returned
+     *
      * @return {@link java.lang.String} representation of content is returned
      */
-    public String getStringContent() {
+    public final String getStringContent() {
         return text;
     }
 
     /**
      * Payload (content) of the message is set with this method
+     *
      * @param content {@link java.lang.String} representation of the content
      */
-    public void setContent(String content) {
+    public final void setContent(String content) {
         this.text = content;
     }
 
     /**
      * Message id to uniquely identify the message is set
+     *
      * @param messageID unique {@link java.lang.String} to identify the message
      */
-    public void setMessageID(String messageID) {
+    public final void setMessageID(String messageID) {
         this.messageId = messageID;
     }
 
     /**
      * Returns the message id of the message
+     *
      * @return message id
      */
-    public String getMessageID() {
+    public final String getMessageID() {
         return messageId;
     }
 
     /**
      * String representation of the message including headers
+     *
      * @return {@link java.lang.String} representation of the whole message including headers is returned
      */
-    @Override
-    public String toString() {
+    public final String toString() {
         return "\nmessage id: " + messageId + "\n" +
                 "timestamp: " + timestamp + "\n" +
                 "content: " + text;

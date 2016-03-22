@@ -42,7 +42,7 @@ public class AMQPQueueReceiver implements SimpleConsumer {
     private MessageConsumer consumer;
     private SubscriberConfig config;
 
-    public ATCMessage receive() throws ATCException {
+    public final ATCMessage receive() throws ATCException {
         try {
             Message message = consumer.receive();
             message.acknowledge();
@@ -54,7 +54,7 @@ public class AMQPQueueReceiver implements SimpleConsumer {
 
     }
 
-    public void close() throws ATCException {
+    public final void close() throws ATCException {
         try {
             consumer.close();
             queueSession.close();
@@ -65,11 +65,11 @@ public class AMQPQueueReceiver implements SimpleConsumer {
         }
     }
 
-    public void unsubscribe() {
+    public final void unsubscribe() {
 
     }
 
-    public MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException {
+    public final MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException {
         try {
             String queueName = conf.getQueueName();
             Properties properties = new Properties();
@@ -93,7 +93,7 @@ public class AMQPQueueReceiver implements SimpleConsumer {
         }
     }
 
-    public SubscriberConfig getConfigs() {
+    public final SubscriberConfig getConfigs() {
         return config;
     }
 }

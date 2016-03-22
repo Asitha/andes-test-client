@@ -42,14 +42,14 @@ public class PublisherThread implements Runnable {
     public PublisherThread(SimplePublisher publisher) {
         this.publisher = publisher;
         sentCount = new AtomicInteger(0);
-        publishRate = Main.metrics.meter(name(
-                        "publisher", publisher.getConfigs().getQueueName(),
-                        "publisher id " + publisher.getConfigs().getId(),
-                        "meter")
+        publishRate = Main.METRICS.meter(name(
+                "publisher", publisher.getConfigs().getQueueName(),
+                "publisher id " + publisher.getConfigs().getId(),
+                "meter")
         );
 
         // Messages sent for a given time period is collected through this gauge
-        Main.gauges.register(
+        Main.GAUGES.register(
                 name("Publisher", publisher.getConfigs().getQueueName(),
                         "publisher id " + this.publisher.getConfigs().getId(), "gauge"),
                 new Gauge<Integer>() {
@@ -67,8 +67,8 @@ public class PublisherThread implements Runnable {
                 });
     }
 
-    public void run() {
-        if(publisher.getConfigs().isTransactional()) {
+    public final void run() {
+        if (publisher.getConfigs().isTransactional()) {
             transactionalPublish();
         } else {
             publish();
@@ -95,7 +95,7 @@ public class PublisherThread implements Runnable {
                 sentCount.incrementAndGet();
                 publishRate.mark();
 
-                if(config.getDelayBetweenMsgs() > 0) {
+                if (config.getDelayBetweenMsgs() > 0) {
                     Thread.sleep(publisher.getConfigs().getDelayBetweenMsgs());
                 }
             }
@@ -122,7 +122,7 @@ public class PublisherThread implements Runnable {
 
         log.info("Starting transactional publisher to send " + messageCount + " messages to " +
                 publisher.getConfigs().getQueueName() + ". Publisher ID: " + publisherID);
-        ATCMessage ATCMessage;
+        ATCMessage atcMessage;
         int batchSize = publisher.getConfigs().getTransactionBatchSize();
 
         DisruptorBasedPublisher disruptorPublisher =
@@ -130,9 +130,9 @@ public class PublisherThread implements Runnable {
 
         for (int i = 1; i <= messageCount; i++) {
             try {
-                ATCMessage = publisher.createTextMessage(i + " Publisher: " + publisherID);
-                ATCMessage.setMessageID(Integer.toString(i));
-                disruptorPublisher.publish(ATCMessage);
+                atcMessage = publisher.createTextMessage(i + " Publisher: " + publisherID);
+                atcMessage.setMessageID(Integer.toString(i));
+                disruptorPublisher.publish(atcMessage);
             } catch (ATCException e) {
                 log.error("Exception occurred while creating message for publisher " + publisherID, e);
                 i--; // resend

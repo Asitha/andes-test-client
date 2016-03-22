@@ -50,16 +50,16 @@ public class ConsumerThread implements Runnable {
     public ConsumerThread(SimpleConsumer consumer, Histogram globalLatency, Meter globalConsumerRate) {
         this.consumer = consumer;
         receivedCount = new AtomicInteger(0);
-        latencyHist = Main.metrics.histogram(
+        latencyHist = Main.METRICS.histogram(
                 name("consumer", consumer.getConfigs().getQueueName(),
                         "consumer id " + this.consumer.getConfigs().getId(), "latency")
         );
-        consumerRate = Main.metrics.meter(
+        consumerRate = Main.METRICS.meter(
                 name("consumer", consumer.getConfigs().getQueueName(),
                         "consumer id " + this.consumer.getConfigs().getId(), "rate"));
 
         // Per given period how many messages were sent is taken through this gauge
-        Main.gauges.register(
+        Main.GAUGES.register(
                 name(ConsumerThread.class, this.consumer.getConfigs().getId(), "receiving-stats"),
                 new Gauge<Integer>() {
 
@@ -74,7 +74,7 @@ public class ConsumerThread implements Runnable {
         this.globalLatencyHist = globalLatency;
     }
 
-    public void run() {
+    public final void run() {
 
         long messageCount = consumer.getConfigs().getMessageCount();
         String consumerID = consumer.getConfigs().getId();

@@ -41,7 +41,7 @@ public class AMQPTopicPublisher implements SimplePublisher {
     private TopicConnection topicConnection;
     private PublisherConfig config;
 
-    public void send(ATCMessage atcMessage) throws ATCException {
+    public final void send(ATCMessage atcMessage) throws ATCException {
         try {
             Message m = MessageUtils.fromATCToJMS(topicSession, atcMessage);
             topicPublisher.send(m);
@@ -50,7 +50,7 @@ public class AMQPTopicPublisher implements SimplePublisher {
         }
     }
 
-    public void commit() throws ATCException{
+    public final void commit() throws ATCException {
         try {
             topicSession.commit();
         } catch (JMSException e) {
@@ -58,7 +58,7 @@ public class AMQPTopicPublisher implements SimplePublisher {
         }
     }
 
-    public void rollback() throws ATCException {
+    public final void rollback() throws ATCException {
         try {
             topicSession.rollback();
         } catch (JMSException e) {
@@ -66,7 +66,7 @@ public class AMQPTopicPublisher implements SimplePublisher {
         }
     }
 
-    public void init(PublisherConfig conf) throws NamingException, ATCException {
+    public final void init(PublisherConfig conf) throws NamingException, ATCException {
 
         try {
             this.config = conf;
@@ -97,15 +97,15 @@ public class AMQPTopicPublisher implements SimplePublisher {
         }
     }
 
-    public ATCMessage createTextMessage(String text) throws ATCException {
+    public final ATCMessage createTextMessage(String text) throws ATCException {
         return new ATCMessage(text);
     }
 
-    public PublisherConfig getConfigs() {
+    public final PublisherConfig getConfigs() {
         return config;
     }
 
-    public void close() throws ATCException {
+    public final void close() throws ATCException {
         try {
             topicPublisher.close();
             topicSession.close();

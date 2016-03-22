@@ -67,14 +67,14 @@ public abstract class PubSubConfig {
         id = UUID.randomUUID().toString();
     }
 
-    void addGlobalConfigurationsIfAbsent(TestConfiguration tc) {
-        if(port == 0){
+    final void addGlobalConfigurationsIfAbsent(TestConfiguration tc) {
+        if (port == 0) {
             setPort(tc.getPort());
         }
-        if(StringUtils.isBlank(getHostname())) {
+        if (StringUtils.isBlank(getHostname())) {
             setHostname(tc.getHostname());
         }
-        if(StringUtils.isBlank(getUsername())) {
+        if (StringUtils.isBlank(getUsername())) {
             setUsername(tc.getUsername());
         }
         if (StringUtils.isBlank(getPassword())) {
@@ -92,18 +92,18 @@ public abstract class PubSubConfig {
         if (StringUtils.isBlank(getClientID())) {
             setClientID(tc.getClientID());
         }
-        if(StringUtils.isBlank(getVirtualHostName())) {
+        if (StringUtils.isBlank(getVirtualHostName())) {
             setVirtualHostName(tc.getVirtualHostName());
         }
     }
 
-    public String getTCPConnectionURL() {
+    public final String getTCPConnectionURL() {
         // amqp://{username}:{password}@carbon/carbon?brokerlist='tcp://{hostname}:{port}'
         StringBuilder builder = new StringBuilder();
         builder.append("amqp://").append(getUsername()).append(":").append(getPassword()).append("@").
                 append(getClientID()).append("/").append(getVirtualHostName()).append("?");
 
-        if(StringUtils.isEmpty(getFailoverParams())) {
+        if (StringUtils.isEmpty(getFailoverParams())) {
             builder.append("brokerlist='tcp://").append(getHostname()).append(":").append(getPort()).append("'");
         } else {
             builder.append(getFailoverParams());
@@ -112,148 +112,148 @@ public abstract class PubSubConfig {
         return builder.toString();
     }
 
-    public int getPort() {
+    public final int getPort() {
         return port;
     }
 
-    void setPort(int port) {
+    final void setPort(int port) {
         this.port = port;
     }
 
-    public String getHostname() {
+    public final String getHostname() {
         return hostname;
     }
 
-    void setHostname(String hostname) {
+    final void setHostname(String hostname) {
         this.hostname = hostname;
     }
 
-    public String getUsername() {
+    public final String getUsername() {
         return username;
     }
 
-    void setUsername(String username) {
+    final void setUsername(String username) {
         this.username = username;
     }
 
-    public String getPassword() {
+    public final String getPassword() {
         return password;
     }
 
-    void setPassword(String password) {
+    final void setPassword(String password) {
         this.password = password;
     }
 
-    public String getInitialContextFactory() {
+    public final String getInitialContextFactory() {
         return initialContextFactory;
     }
 
-    void setInitialContextFactory(String initialContextFactory) {
+    final void setInitialContextFactory(String initialContextFactory) {
         this.initialContextFactory = initialContextFactory;
     }
 
-    public String getConnectionFactoryPrefix() {
+    public final String getConnectionFactoryPrefix() {
         return connectionFactoryPrefix;
     }
 
-    void setConnectionFactoryPrefix(String connectionFactoryPrefix) {
+    final void setConnectionFactoryPrefix(String connectionFactoryPrefix) {
         this.connectionFactoryPrefix = connectionFactoryPrefix;
     }
 
-    public String getConnectionFactoryName() {
+    public final String getConnectionFactoryName() {
         return connectionFactoryName;
     }
 
-    void setConnectionFactoryName(String connectionFactoryName) {
+    final void setConnectionFactoryName(String connectionFactoryName) {
         this.connectionFactoryName = connectionFactoryName;
     }
 
-    public String getClientID() {
+    public final String getClientID() {
         return clientID;
     }
 
-    void setClientID(String clientID) {
+    final void setClientID(String clientID) {
         this.clientID = clientID;
     }
 
-    public String getVirtualHostName() {
+    public final String getVirtualHostName() {
         return virtualHostName;
     }
 
-    void setVirtualHostName(String virtualHostName) {
+    final void setVirtualHostName(String virtualHostName) {
         this.virtualHostName = virtualHostName;
     }
 
-    public long getMessageCount() {
+    public final long getMessageCount() {
         return messageCount;
     }
 
-    void setMessageCount(long messageCount) {
+    final void setMessageCount(long messageCount) {
         this.messageCount = messageCount;
     }
 
-    public String getQueueName() {
+    public final String getQueueName() {
         return queueName;
     }
 
-    void setQueueName(String queueName) {
+    final void setQueueName(String queueName) {
         this.queueName = queueName;
     }
 
-    public String getId() {
+    public final String getId() {
         return id;
     }
 
-    void setId(String id) {
+    final void setId(String id) {
         this.id = id;
     }
 
-    public boolean isTransactional() {
+    public final boolean isTransactional() {
         return isTransactional;
     }
 
-    void setTransactional(boolean transactional) {
+    final void setTransactional(boolean transactional) {
         isTransactional = transactional;
     }
 
-    public int getTransactionBatchSize() {
+    public final int getTransactionBatchSize() {
         return transactionBatchSize;
     }
 
-    void setTransactionBatchSize(int transactionBatchSize) {
+    final void setTransactionBatchSize(int transactionBatchSize) {
         this.transactionBatchSize = transactionBatchSize;
     }
 
-    public String getFailoverParams() {
+    public final String getFailoverParams() {
         return failoverParams;
     }
 
-    void setFailoverParams(String failoverParams) {
+    final void setFailoverParams(String failoverParams) {
         this.failoverParams = failoverParams;
     }
 
-    public int getDelayBetweenMsgs() {
+    public final int getDelayBetweenMsgs() {
         return delayBetweenMsgs;
     }
 
-    void setDelayBetweenMsgs(int delayBetweenMsgs) {
+    final void setDelayBetweenMsgs(int delayBetweenMsgs) {
         this.delayBetweenMsgs = delayBetweenMsgs;
     }
 
-    public int getParallelThreads() {
+    public final int getParallelThreads() {
         return parallelThreads;
     }
 
-    public void setParallelThreads(int parallelThreads) {
+    public final void setParallelThreads(int parallelThreads) {
         this.parallelThreads = parallelThreads;
     }
 
-    Object copyMembers(Object original, Object copy) throws NoSuchFieldException, IllegalAccessException {
-        for(Field originalsField: original.getClass().getDeclaredFields()) {
+    final Object copyMembers(Object original, Object copy) throws NoSuchFieldException, IllegalAccessException {
+        for (Field originalsField : original.getClass().getDeclaredFields()) {
             Field copyField = copy.getClass().getDeclaredField(originalsField.getName());
             copyField(originalsField, copyField, original, copy);
         }
-        for (Field originalsField: original.getClass().getSuperclass().getDeclaredFields()) {
+        for (Field originalsField : original.getClass().getSuperclass().getDeclaredFields()) {
             Field copyField = copy.getClass().getSuperclass().getDeclaredField(originalsField.getName());
             copyField(originalsField, copyField, original, copy);
         }

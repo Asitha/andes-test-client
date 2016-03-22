@@ -29,23 +29,23 @@ public class PublisherConfig extends PubSubConfig {
     @XmlAttribute
     private String messageContent;
 
-    public int getPublisherMaxThroughput() {
+    public final int getPublisherMaxThroughput() {
         return publisherMaxThroughput;
     }
 
-    void setPublisherMaxThroughput(int publisherMaxThroughput) {
+    final void setPublisherMaxThroughput(int publisherMaxThroughput) {
         this.publisherMaxThroughput = publisherMaxThroughput;
     }
 
-    public String getMessageContent() {
+    public final String getMessageContent() {
         return messageContent;
     }
 
-    void setMessageContent(String messageContent) {
+    final void setMessageContent(String messageContent) {
         this.messageContent = messageContent;
     }
 
-    PublisherConfig copy() throws NoSuchFieldException, IllegalAccessException {
+    final PublisherConfig copy() throws NoSuchFieldException, IllegalAccessException {
         PublisherConfig copy = new PublisherConfig();
         copyMembers(this, copy);
         return copy;

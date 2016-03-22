@@ -20,6 +20,7 @@ import com.codahale.metrics.Meter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.TimeoutException;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.apache.commons.logging.Log;
@@ -41,14 +42,15 @@ class DisruptorBasedPublisher {
     private Disruptor<PublishEvent> disruptor;
     private ExecutorService executorPool;
     private static final int EXECUTOR_POOL_SHUTDOWN_WAIT_TIME = 10;
+    private static final int DEFAULT_DISRUPTOR_BUFFER_SIZE = 4096;
 
     DisruptorBasedPublisher(int batchSize, SimplePublisher publisher, AtomicInteger sentCount, Meter publishRate) {
 
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
-                .setNameFormat("Disruptor Publisher Thread. Publisher " +
-                        publisher.getConfigs().getId()).build();
+                .setNameFormat("DisruptorPublisherThread-id-" +
+                        publisher.getConfigs().getId() + "-%d").build();
         executorPool = Executors.newCachedThreadPool(namedThreadFactory);
-        int bufferSize = 4096;
+        int bufferSize = DEFAULT_DISRUPTOR_BUFFER_SIZE;
 
         disruptor = new Disruptor<PublishEvent>(
                 PublishEvent.getFactory(),
@@ -99,12 +101,14 @@ class DisruptorBasedPublisher {
      * wait for them to finish as well.
      */
     void shutdown() {
-        disruptor.shutdown();
-        executorPool.shutdown();
         try {
+            disruptor.shutdown(EXECUTOR_POOL_SHUTDOWN_WAIT_TIME, TimeUnit.SECONDS);
+            executorPool.shutdown();
             executorPool.awaitTermination(EXECUTOR_POOL_SHUTDOWN_WAIT_TIME, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        } catch (TimeoutException e) {
+            log.error("Error occurred while closing Disruptor buffer.", e);
         }
     }
 }

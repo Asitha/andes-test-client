@@ -36,11 +36,11 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
     private TopicSubscriber topicSubscriber;
     private SubscriberConfig config;
 
-    final public SubscriberConfig getConfigs() {
+    public final SubscriberConfig getConfigs() {
         return config;
     }
 
-    final public ATCMessage receive() throws ATCException {
+    public final ATCMessage receive() throws ATCException {
         try {
             Message m = topicSubscriber.receive();
             return MessageUtils.fromJMSToATC(m);
@@ -50,7 +50,7 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
         }
     }
 
-    final public void close() throws ATCException {
+    public final void close() throws ATCException {
         try {
             topicSubscriber.close();
             topicSession.close();
@@ -60,7 +60,7 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
         }
     }
 
-    final public void unsubscribe() throws ATCException {
+    public final void unsubscribe() throws ATCException {
         try {
             topicSession.unsubscribe(subscriptionId);
         } catch (JMSException e) {
@@ -68,7 +68,7 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
         }
     }
 
-    final public MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException {
+    public final MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException {
 
         try {
             String topicName = conf.getQueueName();
