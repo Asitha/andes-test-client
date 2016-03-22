@@ -28,6 +28,8 @@ public class SubscriberConfig extends PubSubConfig {
     private String subscriptionID;
     @XmlAttribute
     private boolean unsubscribeOnFinish;
+    @XmlAttribute
+    private boolean enableClientAcknowledgment;
 
     final void setSubscriptionID(String subscriptionID) {
         this.subscriptionID = subscriptionID;
@@ -49,5 +51,13 @@ public class SubscriberConfig extends PubSubConfig {
         SubscriberConfig copy = new SubscriberConfig();
         copyMembers(this, copy);
         return copy;
+    }
+
+    public boolean isEnableClientAcknowledgment() {
+        return enableClientAcknowledgment;
+    }
+
+    public void setEnableClientAcknowledgment(boolean enableClientAcknowledgment) {
+        this.enableClientAcknowledgment = enableClientAcknowledgment;
     }
 }

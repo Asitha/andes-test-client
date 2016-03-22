@@ -45,7 +45,9 @@ public class AMQPQueueReceiver implements SimpleConsumer {
     public final ATCMessage receive() throws ATCException {
         try {
             Message message = consumer.receive();
-            message.acknowledge();
+            if (config.isEnableClientAcknowledgment()) {
+                message.acknowledge();
+            }
             return MessageUtils.fromJMSToATC(message);
         } catch (JMSException e) {
             throw new ATCException("Error occurred while processing received message. Subscriber id: " +
@@ -81,8 +83,11 @@ public class AMQPQueueReceiver implements SimpleConsumer {
             QueueConnectionFactory connFactory = (QueueConnectionFactory) ctx.lookup(conf.getConnectionFactoryName());
             queueConnection = connFactory.createQueueConnection();
             queueConnection.start();
-            queueSession =
-                    queueConnection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+            if (conf.isEnableClientAcknowledgment()) {
+                queueSession = queueConnection.createQueueSession(false, QueueSession.CLIENT_ACKNOWLEDGE);
+            } else {
+                queueSession = queueConnection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+            }
             //Receive message
             Queue queue = (Queue) ctx.lookup(queueName);
             consumer = queueSession.createConsumer(queue);

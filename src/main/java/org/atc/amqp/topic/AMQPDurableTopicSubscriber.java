@@ -43,6 +43,9 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
     public final ATCMessage receive() throws ATCException {
         try {
             Message m = topicSubscriber.receive();
+            if (config.isEnableClientAcknowledgment()) {
+                m.acknowledge();
+            }
             return MessageUtils.fromJMSToATC(m);
         } catch (JMSException e) {
             throw new ATCException("Error occurred while processing received message. Subscriber id: " +
@@ -82,7 +85,11 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
             TopicConnectionFactory connFactory = (TopicConnectionFactory) ctx.lookup(conf.getConnectionFactoryName());
             topicConnection = connFactory.createTopicConnection();
             topicConnection.start();
-            topicSession = topicConnection.createTopicSession(true, TopicSession.AUTO_ACKNOWLEDGE);
+            if (conf.isEnableClientAcknowledgment()) {
+                topicSession = topicConnection.createTopicSession(true, TopicSession.CLIENT_ACKNOWLEDGE);
+            } else {
+                topicSession = topicConnection.createTopicSession(true, TopicSession.AUTO_ACKNOWLEDGE);
+            }
 
             // create durable subscriber with subscription ID
             Topic topic = (Topic) ctx.lookup(topicName);

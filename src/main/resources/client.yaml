@@ -42,19 +42,21 @@ queueSubscribers:
   - queueName: games
     messageCount: 10000
     parallelThreads: 1
+    enableClientAcknowledgment: false
 
 #topicSubscribers:
 #  - queueName: Queue
 #    messageCount: 156
+#    enableClientAcknowledgment: false
 
-
-#durableTopicSubscribers:
-#  - queueName: games
-#    id: genId
-#    messageCount: 10000
-#    subscriptionID: subId
-#    unsubscribeOnFinish: true
-#    parallelThreads: 5
+durableTopicSubscribers:
+  - queueName: games
+    id: testDurableSub
+    messageCount: 10000
+    subscriptionID: subId
+    unsubscribeOnFinish: true
+    parallelThreads: 5
+    enableClientAcknowledgment: false
 
 ## End of subscriber configurations
 

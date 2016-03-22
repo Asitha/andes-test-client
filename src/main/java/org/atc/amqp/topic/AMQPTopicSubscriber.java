@@ -55,8 +55,11 @@ public class AMQPTopicSubscriber implements SimpleConsumer {
             TopicConnectionFactory connFactory = (TopicConnectionFactory) ctx.lookup(config.getConnectionFactoryName());
             topicConnection = connFactory.createTopicConnection();
             topicConnection.start();
-            topicSession =
-                    topicConnection.createTopicSession(false, TopicSession.CLIENT_ACKNOWLEDGE);
+            if (config.isEnableClientAcknowledgment()) {
+                topicSession = topicConnection.createTopicSession(false, TopicSession.CLIENT_ACKNOWLEDGE);
+            } else {
+                topicSession = topicConnection.createTopicSession(false, TopicSession.AUTO_ACKNOWLEDGE);
+            }
             // Send message
             Topic topic = topicSession.createTopic(config.getQueueName());
             this.topicSubscriber = topicSession.createSubscriber(topic);
@@ -74,6 +77,9 @@ public class AMQPTopicSubscriber implements SimpleConsumer {
     public final ATCMessage receive() throws ATCException {
         try {
             Message message = topicSubscriber.receive();
+            if (config.isEnableClientAcknowledgment()) {
+                message.acknowledge();
+            }
             return MessageUtils.fromJMSToATC(message);
         } catch (JMSException e) {
             throw new ATCException("Error occurred while processing received message. Subscriber id: " +
