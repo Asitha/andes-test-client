@@ -86,9 +86,9 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
             topicConnection = connFactory.createTopicConnection();
             topicConnection.start();
             if (conf.isEnableClientAcknowledgment()) {
-                topicSession = topicConnection.createTopicSession(true, TopicSession.CLIENT_ACKNOWLEDGE);
+                topicSession = topicConnection.createTopicSession(false, TopicSession.CLIENT_ACKNOWLEDGE);
             } else {
-                topicSession = topicConnection.createTopicSession(true, TopicSession.AUTO_ACKNOWLEDGE);
+                topicSession = topicConnection.createTopicSession(false, TopicSession.AUTO_ACKNOWLEDGE);
             }
 
             // create durable subscriber with subscription ID
