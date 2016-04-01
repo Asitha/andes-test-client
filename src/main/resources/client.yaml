@@ -38,7 +38,7 @@ virtualHostName: carbon
 printPerMessages: 1000
 
 enableConsoleReport: true
-consoleReportUpdateInterval: 20
+consoleReportUpdateInterval: 2
 
 jmxReportEnable: false
 
@@ -53,16 +53,16 @@ csvGaugeUpdateInterval: 1000
 # Publisher Configurations
 # ------------------------
 
-queuePublishers:
-   - queueName: games
-     messageCount: 10000
-     isTransactional: true
-     transactionBatchSize: 50
-     parallelThreads: 1
-
-#topicPublishers:
+#queuePublishers:
 #   - queueName: games
-#     messageCount: 1
+#     messageCount: 10000
+#     isTransactional: true
+#     transactionBatchSize: 50
+#     parallelThreads: 10
+
+topicPublishers:
+   - queueName: games
+     messageCount: 1000
      # failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
 
 
@@ -71,25 +71,29 @@ queuePublishers:
 # Subscriber configurations
 # -------------------------
 
-queueSubscribers:
-  - queueName: games
-    messageCount: 10000
-    parallelThreads: 1
-    enableClientAcknowledgment: false
+#queueSubscribers:
+#  - queueName: games
+#    messageCount: 10000
+#    parallelThreads: 1
+#    enableClientAcknowledgment: true
 
 #topicSubscribers:
-#  - queueName: Queue
-#    messageCount: 156
+#  - queueName: games
+#    port: 5673
+#    messageCount: 100
+#    receiveWaitTimeMillis: 1000
+#    port: 5673
 #    enableClientAcknowledgment: false
 
 durableTopicSubscribers:
   - queueName: games
-    id: testDurableSub
-    messageCount: 10000
+    id: are_you_ok
+    messageCount: 205
     subscriptionID: subId
     unsubscribeOnFinish: true
-    parallelThreads: 5
+    parallelThreads: 1
     enableClientAcknowledgment: false
+    receiveWaitTimeMillis: 5000
 
 ## End of subscriber configurations
 

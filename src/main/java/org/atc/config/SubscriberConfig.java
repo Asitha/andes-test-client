@@ -30,6 +30,8 @@ public class SubscriberConfig extends PubSubConfig {
     private boolean unsubscribeOnFinish;
     @XmlAttribute
     private boolean enableClientAcknowledgment;
+    @XmlAttribute
+    private long receiveWaitTimeMillis;
 
     final void setSubscriptionID(String subscriptionID) {
         this.subscriptionID = subscriptionID;
@@ -59,5 +61,13 @@ public class SubscriberConfig extends PubSubConfig {
 
     public void setEnableClientAcknowledgment(boolean enableClientAcknowledgment) {
         this.enableClientAcknowledgment = enableClientAcknowledgment;
+    }
+
+    public long getReceiveWaitTimeMillis() {
+        return receiveWaitTimeMillis;
+    }
+
+    public void setReceiveWaitTimeMillis(long receiveWaitTimeMillis) {
+        this.receiveWaitTimeMillis = receiveWaitTimeMillis;
     }
 }

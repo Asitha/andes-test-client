@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.atc.config.SubscriberConfig;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -88,7 +89,13 @@ public class ConsumerThread implements Runnable {
             for (int i = 1; i <= messageCount; i++) {
 
                 message = consumer.receive();
-
+                if (config.getReceiveWaitTimeMillis() > 0) {
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(config.getReceiveWaitTimeMillis());
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
                 latency = System.currentTimeMillis() - message.getTimeStamp();
                 latencyHist.update(latency);
                 globalLatencyHist.update(latency);
