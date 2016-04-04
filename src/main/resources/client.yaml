@@ -61,9 +61,11 @@ csvGaugeUpdateInterval: 1000
 #     parallelThreads: 10
 
 topicPublishers:
-   - queueName: games
-     messageCount: 1000
-     # failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
+   - queueName: are_you_ok
+     messageCount: 200
+     parallelThreads: 200
+     isUniqueQueue: true
+     failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
 
 
 # End of publisher Configurations
@@ -86,14 +88,17 @@ topicPublishers:
 #    enableClientAcknowledgment: false
 
 durableTopicSubscribers:
-  - queueName: games
+  - queueName: are_you_ok
     id: are_you_ok
-    messageCount: 205
-    subscriptionID: subId
+    messageCount: 200
+    subscriptionID: pumuduSub
     unsubscribeOnFinish: true
-    parallelThreads: 1
+    parallelThreads: 10
     enableClientAcknowledgment: false
     receiveWaitTimeMillis: 5000
+    isUniqueQueue: true
+    failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
+
 
 ## End of subscriber configurations
 
