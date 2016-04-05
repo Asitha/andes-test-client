@@ -43,6 +43,7 @@ public final class MessageUtils {
         ATCMessage message = new ATCMessage();
         message.setMessageID(jmsMessage.getJMSMessageID());
         message.setTimeStamp(jmsMessage.getJMSTimestamp());
+        message.setCorrelationId(jmsMessage.getJMSMessageID());
         if(jmsMessage instanceof TextMessage) {
             TextMessage t = (TextMessage) jmsMessage;
             message.setContent(t.getText());
@@ -63,6 +64,7 @@ public final class MessageUtils {
         Message jmsMessage = session.createTextMessage(message.getStringContent());
         jmsMessage.setJMSTimestamp(message.getTimeStamp());
         jmsMessage.setJMSMessageID(message.getMessageID());
+        jmsMessage.setJMSCorrelationID(message.getCorrelationId());
         return jmsMessage;
     }
 }

@@ -18,6 +18,7 @@ package org.atc;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.atc.config.ConfigReader;
@@ -34,9 +35,11 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class PublisherThread implements Runnable {
 
     private static Log log = LogFactory.getLog(PublisherThread.class);
-    private final Meter publishRate;
+    private static final String DEFAULT_CONTENT = "Test Message";
 
+    private final Meter publishRate;
     private SimplePublisher publisher;
+
     private AtomicInteger sentCount;
 
     public PublisherThread(SimplePublisher publisher) {
@@ -82,11 +85,15 @@ public class PublisherThread implements Runnable {
         log.info("Starting publisher to send " + messageCount + " messages to ." + config.getQueueName() +
                 "  Publisher ID: " + publisherID);
         ATCMessage atcMessage = null;
+        String messageContent = config.getMessageContent();
+        if(StringUtils.isEmpty(messageContent)) {
+            messageContent = DEFAULT_CONTENT;
+        }
 
         try {
-            atcMessage = publisher.createTextMessage(null);
             for (int i = 1; i <= messageCount; i++) {
-
+                atcMessage = publisher.createTextMessage(messageContent);
+                atcMessage.setMessageID(publisherID + "-" + i);
                 publisher.send(atcMessage);
 
                 if (log.isDebugEnabled()) {

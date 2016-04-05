@@ -25,6 +25,7 @@ public class ATCMessage {
 
     private String messageId;
     private String text;
+    private String correlationId;
     private long timestamp;
 
     /**
@@ -105,5 +106,17 @@ public class ATCMessage {
         return "\nmessage id: " + messageId + "\n" +
                 "timestamp: " + timestamp + "\n" +
                 "content: " + text;
+    }
+
+    /**
+     * Correlation Id to map a message from sending to receiving
+     * @return {@link String}
+     */
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
     }
 }

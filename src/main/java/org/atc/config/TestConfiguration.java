@@ -75,6 +75,9 @@ public class TestConfiguration {
     @XmlAttribute
     private int csvGaugeUpdateInterval;
 
+    @XmlAttribute
+    private int publisherInitialDelaySeconds;
+
     @XmlElement(name = "topicPublishers")
     private List<PublisherConfig> topicPublishers;
 
@@ -264,5 +267,13 @@ public class TestConfiguration {
 
     public final void setDurableTopicSubscribers(List<SubscriberConfig> durableTopicSubscribers) {
         this.durableTopicSubscribers = durableTopicSubscribers;
+    }
+
+    public int getPublisherInitialDelaySeconds() {
+        return publisherInitialDelaySeconds;
+    }
+
+    public void setPublisherInitialDelaySeconds(int publisherInitialDelaySeconds) {
+        this.publisherInitialDelaySeconds = publisherInitialDelaySeconds;
     }
 }

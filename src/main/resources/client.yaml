@@ -37,6 +37,8 @@ clientID: carbon
 virtualHostName: carbon
 printPerMessages: 1000
 
+publisherInitialDelaySeconds: 5
+
 enableConsoleReport: true
 consoleReportUpdateInterval: 2
 
@@ -62,8 +64,8 @@ csvGaugeUpdateInterval: 1000
 
 topicPublishers:
    - queueName: are_you_ok
-     messageCount: 200
-     parallelThreads: 200
+     messageCount: 202
+     parallelThreads: 1
      isUniqueQueue: true
      failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
 
@@ -90,12 +92,12 @@ topicPublishers:
 durableTopicSubscribers:
   - queueName: are_you_ok
     id: are_you_ok
-    messageCount: 200
-    subscriptionID: pumuduSub
-    unsubscribeOnFinish: true
-    parallelThreads: 10
-    enableClientAcknowledgment: false
-    receiveWaitTimeMillis: 5000
+    messageCount: 3
+    subscriptionID: d
+    unsubscribeOnFinish: false
+    parallelThreads: 1
+    enableClientAcknowledgment: true
+#    receiveWaitTimeMillis: 5000
     isUniqueQueue: true
     failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
 

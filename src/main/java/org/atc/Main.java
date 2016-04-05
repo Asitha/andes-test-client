@@ -124,6 +124,8 @@ public final class Main {
             threadList.add(subThread);
         }
 
+        TimeUnit.SECONDS.sleep(config.getPublisherInitialDelaySeconds());
+
         // Publishers
         AMQPTopicPublisher topicPublisher;
         for (PublisherConfig publisherConfig : config.getTopicPublishers()) {
