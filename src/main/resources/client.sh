@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+ARGS="$@"
+
 check_java_home() {
 
     if [ -z "$JAVA_HOME" ]; then
@@ -18,8 +20,7 @@ main() {
 
     check_java_home
     echo "Using JAVA_HOME:   $JAVA_HOME"
-    java -jar andes-test-client.jar "$@"
-
+    java -jar andes-test-client.jar $ARGS
 }
 
 main
