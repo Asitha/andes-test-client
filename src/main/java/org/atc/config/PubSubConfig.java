@@ -62,8 +62,6 @@ public abstract class PubSubConfig {
     private String failoverParams;
     @XmlAttribute
     private int delayBetweenMsgs;
-    @XmlAttribute
-    private boolean isUniqueQueue;
 
     PubSubConfig() {
         id = UUID.randomUUID().toString();
@@ -248,14 +246,6 @@ public abstract class PubSubConfig {
 
     public final void setParallelThreads(int parallelThreads) {
         this.parallelThreads = parallelThreads;
-    }
-
-    public boolean isUniqueQueue() {
-        return isUniqueQueue;
-    }
-
-    public void setUniqueQueue(boolean uniqueQueue) {
-        isUniqueQueue = uniqueQueue;
     }
 
     final Object copyMembers(Object original, Object copy) throws NoSuchFieldException, IllegalAccessException {

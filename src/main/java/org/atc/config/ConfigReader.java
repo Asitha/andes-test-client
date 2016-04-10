@@ -50,8 +50,8 @@ public final class ConfigReader {
     }
 
     private static void addGlobalConfigerationsIfAbsent(TestConfiguration tc, List pubsubList) {
-        for(Object obj: pubsubList) {
-            PubSubConfig pubSubConfig = (PubSubConfig) obj ;
+        for (Object obj : pubsubList) {
+            PubSubConfig pubSubConfig = (PubSubConfig) obj;
             pubSubConfig.addGlobalConfigurationsIfAbsent(tc);
         }
     }
@@ -85,19 +85,18 @@ public final class ConfigReader {
         int startPos = subscriberConfigList.size() - 1;
         for (int i = startPos; i > -1; i--) {
             SubscriberConfig sc = subscriberConfigList.get(i);
-            boolean isUniqueQueue = sc.isUniqueQueue();
             int copyCount = sc.getParallelThreads() - 1; // minus the current copy
             for (int j = 0; j < copyCount; j++) {
                 SubscriberConfig copy = sc.copy();
                 copy.setId(sc.getId() + "__" + (j + 2));
                 if (StringUtils.isNotBlank(sc.getSubscriptionID())) {
-                    copy.setSubscriptionID(sc.getSubscriptionID() + "__" + (j + 2));
+                    copy.setSubscriptionID(sc.getSubscriptionID().replace("%d", Integer.toString((j + 2))));
                 }
-                if (isUniqueQueue) {
-                    copy.setQueueName(sc.getQueueName() + "_" + (j + 2));
-                }
+                copy.setQueueName(sc.getQueueName().replace("%d", Integer.toString((j + 2))));
                 subscriberConfigList.add(copy);
             }
+            sc.setSubscriptionID(sc.getSubscriptionID().replace("%d", "1"));
+            sc.setQueueName(sc.getQueueName().replace("%d", "1"));
         }
     }
 
@@ -105,16 +104,14 @@ public final class ConfigReader {
         int startPos = publisherList.size() - 1;
         for (int i = startPos; i > -1; i--) {
             PublisherConfig sc = publisherList.get(i);
-            boolean isUniqueQueue = sc.isUniqueQueue();
             int copyCount = sc.getParallelThreads() - 1; // minus the current copy
             for (int j = 0; j < copyCount; j++) {
                 PublisherConfig copy = sc.copy();
                 copy.setId(sc.getId() + "__" + (j + 2));
-                if (isUniqueQueue) {
-                    copy.setQueueName(sc.getQueueName() + "_" + (j + 2));
-                }
+                copy.setQueueName(sc.getQueueName().replace("%d", Integer.toString(j + 2)));
                 publisherList.add(copy);
             }
+            sc.setQueueName(sc.getQueueName().replace("%d", "1"));
         }
     }
 }
