@@ -95,7 +95,9 @@ public final class ConfigReader {
                 copy.setQueueName(sc.getQueueName().replace("%d", Integer.toString((j + 2))));
                 subscriberConfigList.add(copy);
             }
-            sc.setSubscriptionID(sc.getSubscriptionID().replace("%d", "1"));
+            if (StringUtils.isNotBlank(sc.getSubscriptionID())) {
+                sc.setSubscriptionID(sc.getSubscriptionID().replace("%d", "1"));
+            }
             sc.setQueueName(sc.getQueueName().replace("%d", "1"));
         }
     }

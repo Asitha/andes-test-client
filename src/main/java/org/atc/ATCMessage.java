@@ -97,15 +97,13 @@ public class ATCMessage {
         return messageId;
     }
 
-    /**
-     * String representation of the message including headers
-     *
-     * @return {@link java.lang.String} representation of the whole message including headers is returned
-     */
-    public final String toString() {
-        return "\nmessage id: " + messageId + "\n" +
-                "timestamp: " + timestamp + "\n" +
-                "content: " + text;
+    public String toString() {
+        return "ATCMessage{" +
+                "messageId='" + messageId + '\'' +
+                ", text='" + text + '\'' +
+                ", correlationId='" + correlationId + '\'' +
+                ", timestamp=" + timestamp +
+                '}';
     }
 
     /**
