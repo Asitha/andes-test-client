@@ -1,4 +1,4 @@
-Andes Test Client (ATC)
+WSO2 Message Broker Test Client
 ==============
 
 Overview
