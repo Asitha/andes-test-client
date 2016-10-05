@@ -19,9 +19,10 @@ package org.atc.amqp.queue;
 import org.atc.ATCException;
 import org.atc.ATCMessage;
 import org.atc.SimplePublisher;
-import org.atc.config.PublisherConfig;
 import org.atc.amqp.MessageUtils;
+import org.atc.config.PublisherConfig;
 
+import java.util.Properties;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Queue;
@@ -32,7 +33,6 @@ import javax.jms.QueueSession;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.util.Properties;
 
 public class AMQPQueueSender implements SimplePublisher {
 

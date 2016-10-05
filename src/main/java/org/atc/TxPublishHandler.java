@@ -65,7 +65,7 @@ class TxPublishHandler implements EventHandler<PublishEvent> {
                 }
             }
 
-            if (endOfBatch || (messagesList.size() == batchSize)) {
+            if ((messagesList.size() == batchSize)) {
                 publisher.commit();
                 sentCount.addAndGet(messagesList.size());
                 publishRate.mark(messagesList.size());

@@ -132,12 +132,16 @@ public class PublisherThread implements Runnable {
         ATCMessage atcMessage;
         int batchSize = publisher.getConfigs().getTransactionBatchSize();
 
+        String messageContent = publisher.getConfigs().getMessageContent();
+        if(StringUtils.isEmpty(messageContent)) {
+            messageContent = DEFAULT_CONTENT;
+        }
         DisruptorBasedPublisher disruptorPublisher =
                 new DisruptorBasedPublisher(batchSize, publisher, sentCount, publishRate);
 
         for (int i = 1; i <= messageCount; i++) {
             try {
-                atcMessage = publisher.createTextMessage(i + " Publisher: " + publisherID);
+                atcMessage = publisher.createTextMessage(messageContent);
                 atcMessage.setMessageID(Integer.toString(i));
                 disruptorPublisher.publish(atcMessage);
             } catch (ATCException e) {
