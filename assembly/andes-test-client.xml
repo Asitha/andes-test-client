@@ -48,14 +48,9 @@
     </fileSets>
     <files>
         <file>
-            <source>target/${artifactId}-${version}.jar</source>
+            <source>target/${artifactId}_${version}</source>
             <outputDirectory>/</outputDirectory>
-            <destName>andes-test-client.jar</destName>
-        </file>
-        <file>
-            <source>src/main/resources/client.sh</source>
-            <outputDirectory>/</outputDirectory>
-            <fileMode>0744</fileMode>
+            <destName>${artifactId}_${version}</destName>
         </file>
     </files>
 
