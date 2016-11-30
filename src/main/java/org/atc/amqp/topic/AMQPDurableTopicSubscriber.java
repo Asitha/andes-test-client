@@ -19,14 +19,21 @@ package org.atc.amqp.topic;
 import org.atc.ATCException;
 import org.atc.ATCMessage;
 import org.atc.SimpleConsumer;
-import org.atc.config.SubscriberConfig;
 import org.atc.amqp.MessageUtils;
+import org.atc.config.SubscriberConfig;
 
-import javax.jms.*;
+import java.util.Properties;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.Topic;
+import javax.jms.TopicConnection;
+import javax.jms.TopicConnectionFactory;
+import javax.jms.TopicSession;
+import javax.jms.TopicSubscriber;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.util.Properties;
 
 public class AMQPDurableTopicSubscriber implements SimpleConsumer {
 
@@ -87,6 +94,8 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
             topicConnection.start();
             if (conf.isEnableClientAcknowledgment()) {
                 topicSession = topicConnection.createTopicSession(false, TopicSession.CLIENT_ACKNOWLEDGE);
+            } else if (config.isTransactional()) {
+                topicSession = topicConnection.createTopicSession(true, TopicSession.AUTO_ACKNOWLEDGE);
             } else {
                 topicSession = topicConnection.createTopicSession(false, TopicSession.AUTO_ACKNOWLEDGE);
             }

@@ -40,7 +40,7 @@ printPerMessages: 1000
 publisherInitialDelaySeconds: 5
 
 enableConsoleReport: true
-consoleReportUpdateInterval: 2
+consoleReportUpdateInterval: 30
 
 jmxReportEnable: false
 
@@ -56,18 +56,19 @@ csvGaugeUpdateInterval: 1000
 # ------------------------
 
 #queuePublishers:
-#   - queueName: games
-#     messageCount: 10000
-#     isTransactional: true
-#     transactionBatchSize: 50
-#     parallelThreads: 10
+#  - queueName: games
+#    messageCount: 51250
+#    isTransactional: true
+#    transactionBatchSize: 20250
+#    parallelThreads: 20
+#    messageContent: "message content"
 
-topicPublishers:
-   - queueName: are_you_ok
-     messageCount: 202
-     parallelThreads: 1
-     isUniqueQueue: true
-     failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
+# topicPublishers:
+#    - queueName: are_you_ok
+#      messageCount: 202
+#      parallelThreads: 1
+#      isUniqueQueue: true
+#     failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
 
 
 # End of publisher Configurations
@@ -75,9 +76,9 @@ topicPublishers:
 # Subscriber configurations
 # -------------------------
 
-#queueSubscribers:
+# topicSubscribers:
 #  - queueName: games
-#    messageCount: 10000
+#    messageCount: 512500
 #    parallelThreads: 1
 #    enableClientAcknowledgment: true
 
@@ -90,17 +91,18 @@ topicPublishers:
 #    enableClientAcknowledgment: false
 
 durableTopicSubscribers:
-  - queueName: are_you_ok
-    id: are_you_ok
-    messageCount: 3
-    subscriptionID: d
-    unsubscribeOnFinish: false
-    parallelThreads: 1
-    enableClientAcknowledgment: true
-#    receiveWaitTimeMillis: 5000
-    isUniqueQueue: true
-    failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
+   - queueName: topic_%d
+     id: id_%d
+     messageCount: 461250
+     subscriptionID: sub_id_%d
+     unsubscribeOnFinish: false
+     isTransactional: false
+     messageContent: "Test Message"
+     parallelThreads: 1
+#     failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
+# #     enableClientAcknowledgment: true
+# #    receiveWaitTimeMillis: 5000
+#     isUniqueQueue: true
 
 
 ## End of subscriber configurations
-

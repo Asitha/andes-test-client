@@ -19,20 +19,20 @@ package org.atc.amqp.queue;
 import org.atc.ATCException;
 import org.atc.ATCMessage;
 import org.atc.SimpleConsumer;
-import org.atc.config.SubscriberConfig;
 import org.atc.amqp.MessageUtils;
+import org.atc.config.SubscriberConfig;
 
+import java.util.Properties;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageConsumer;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
 import javax.jms.QueueSession;
-import javax.jms.MessageConsumer;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.util.Properties;
 
 public class AMQPQueueReceiver implements SimpleConsumer {
 
@@ -85,6 +85,8 @@ public class AMQPQueueReceiver implements SimpleConsumer {
             queueConnection.start();
             if (conf.isEnableClientAcknowledgment()) {
                 queueSession = queueConnection.createQueueSession(false, QueueSession.CLIENT_ACKNOWLEDGE);
+            } else if (config.isTransactional()) {
+                queueSession = queueConnection.createQueueSession(true, QueueSession.AUTO_ACKNOWLEDGE);
             } else {
                 queueSession = queueConnection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
             }
