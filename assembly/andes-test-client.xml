@@ -31,6 +31,8 @@
             <outputDirectory>conf</outputDirectory>
             <includes>
                 <include>client.yaml</include>
+                <include>queue-test.yaml</include>
+                <include>topic-test.yaml</include>
                 <include>log4j.properties</include>
             </includes>
         </fileSet>
@@ -54,7 +56,7 @@
         </file>
     </files>
 
-    <!-- use this section if you want to package dependencies -->
+    <!-- package dependencies -->
     <dependencySets>
         <dependencySet>
             <outputDirectory>lib</outputDirectory>

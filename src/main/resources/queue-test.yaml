@@ -1,0 +1,81 @@
+#
+# Copyright 2015 Asitha Nanayakkara
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Configuration file for Andes Test Client
+
+# Global Configurations
+# ---------------------
+#
+# This configurations apply to all the publishers and subscribers. This configuration
+# values can be overridden by adding different values for the same parameters within the
+# respective publisher and subscriber sections
+#
+
+hostname: localhost
+port: 5672
+username: admin
+password: admin
+
+initialContextFactory: org.wso2.andes.jndi.PropertiesFileInitialContextFactory
+connectionFactoryPrefix: connectionfactory
+connectionFactoryName: andesConnectionfactory
+
+clientID: carbon
+virtualHostName: carbon
+printPerMessages: 1000
+
+publisherInitialDelaySeconds: 5
+
+enableConsoleReport: true
+consoleReportUpdateInterval: 30
+
+jmxReportEnable: false
+
+csvReportEnable: true
+csvUpdateInterval: 1
+
+# guage update interval in milliseconds
+csvGaugeUpdateInterval: 1000
+
+# End of Global Configurations
+
+# Publisher Configurations
+# ------------------------
+
+queuePublishers:
+
+  - queueName: games
+    messageCount: 100
+    isTransactional: false
+    transactionBatchSize: 10
+    parallelThreads: 1
+    messageContent: "test message content"
+#     failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
+
+# End of publisher Configurations
+
+# Subscriber configurations
+# -------------------------
+
+queueSubscribers:
+
+  - queueName: games
+    messageCount: 100
+    parallelThreads: 1
+    enableClientAcknowledgment: true
+    isTransactional: false
+
+## End of subscriber configurations
