@@ -55,13 +55,14 @@ csvGaugeUpdateInterval: 1000
 # Publisher Configurations
 # ------------------------
 
-#queuePublishers:
-#  - queueName: games
-#    messageCount: 51250
-#    isTransactional: true
-#    transactionBatchSize: 20250
-#    parallelThreads: 20
-#    messageContent: "message content"
+queuePublishers:
+  - queueName: games
+    messageCount: 51250
+    isTransactional: true
+    transactionBatchSize: 20250
+    parallelThreads: 20
+    delayBetweenMsgs: 100
+    messageContent: "message content"
 
 # topicPublishers:
 #    - queueName: are_you_ok
@@ -90,15 +91,15 @@ csvGaugeUpdateInterval: 1000
 #    port: 5673
 #    enableClientAcknowledgment: false
 
-durableTopicSubscribers:
-   - queueName: topic_%d
-     id: id_%d
-     messageCount: 461250
-     subscriptionID: sub_id_%d
-     unsubscribeOnFinish: false
-     isTransactional: false
-     messageContent: "Test Message"
-     parallelThreads: 1
+#durableTopicSubscribers:
+#   - queueName: topic_%d
+#     id: id_%d
+#     messageCount: 461250
+#     subscriptionID: sub_id_%d
+#     unsubscribeOnFinish: false
+#     isTransactional: false
+#     messageContent: "Test Message"
+#     parallelThreads: 1
 #     failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
 # #     enableClientAcknowledgment: true
 # #    receiveWaitTimeMillis: 5000

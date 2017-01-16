@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.atc.config.ConfigReader;
 import org.atc.config.PublisherConfig;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -103,7 +104,7 @@ public class PublisherThread implements Runnable {
                 publishRate.mark();
 
                 if (config.getDelayBetweenMsgs() > 0) {
-                    Thread.sleep(publisher.getConfigs().getDelayBetweenMsgs());
+                    TimeUnit.NANOSECONDS.sleep(publisher.getConfigs().getDelayBetweenMsgs());
                 }
             }
 
