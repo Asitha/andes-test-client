@@ -80,6 +80,7 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
 
     public final MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException {
 
+        config = conf;
         try {
             String topicName = conf.getQueueName();
             subscriptionId = conf.getSubscriptionID();
@@ -94,7 +95,7 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
             topicConnection.start();
             if (conf.isEnableClientAcknowledgment()) {
                 topicSession = topicConnection.createTopicSession(false, TopicSession.CLIENT_ACKNOWLEDGE);
-            } else if (config.isTransactional()) {
+            } else if (conf.isTransactional()) {
                 topicSession = topicConnection.createTopicSession(true, TopicSession.AUTO_ACKNOWLEDGE);
             } else {
                 topicSession = topicConnection.createTopicSession(false, TopicSession.AUTO_ACKNOWLEDGE);
@@ -103,7 +104,6 @@ public class AMQPDurableTopicSubscriber implements SimpleConsumer {
             // create durable subscriber with subscription ID
             Topic topic = (Topic) ctx.lookup(topicName);
             topicSubscriber = topicSession.createDurableSubscriber(topic, subscriptionId);
-            config = conf;
             return topicSubscriber;
         } catch (JMSException e) {
             throw new ATCException("Subscriber initialisation failed. Subscriber id " + config.getId(), e);

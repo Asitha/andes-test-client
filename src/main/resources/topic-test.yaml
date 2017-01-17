@@ -61,6 +61,7 @@ topicPublishers:
     isTransactional: false
     transactionBatchSize: 10
     parallelThreads: 1
+    messagesPerSecond: 1500
     messageContent: "topic message content"
 
 # End of publisher Configurations
@@ -79,6 +80,7 @@ topicSubscribers:
     id: "subscriber"
     messageCount: 100
 #    receiveWaitTimeMillis: 1000
+#    messagesPerSecond: 1500
     enableClientAcknowledgment: false
     parallelThreads: 1
 

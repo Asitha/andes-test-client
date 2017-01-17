@@ -72,6 +72,7 @@ public class AMQPQueueReceiver implements SimpleConsumer {
     }
 
     public final MessageConsumer subscribe(SubscriberConfig conf) throws NamingException, ATCException {
+        config = conf;
         try {
             String queueName = conf.getQueueName();
             Properties properties = new Properties();
@@ -83,7 +84,7 @@ public class AMQPQueueReceiver implements SimpleConsumer {
             QueueConnectionFactory connFactory = (QueueConnectionFactory) ctx.lookup(conf.getConnectionFactoryName());
             queueConnection = connFactory.createQueueConnection();
             queueConnection.start();
-            if (conf.isEnableClientAcknowledgment()) {
+            if (config.isEnableClientAcknowledgment()) {
                 queueSession = queueConnection.createQueueSession(false, QueueSession.CLIENT_ACKNOWLEDGE);
             } else if (config.isTransactional()) {
                 queueSession = queueConnection.createQueueSession(true, QueueSession.AUTO_ACKNOWLEDGE);
@@ -93,7 +94,6 @@ public class AMQPQueueReceiver implements SimpleConsumer {
             //Receive message
             Queue queue = (Queue) ctx.lookup(queueName);
             consumer = queueSession.createConsumer(queue);
-            config = conf;
             return consumer;
         } catch (JMSException e) {
             throw new ATCException("Subscriber initialisation failed. Subscriber id " + config.getId(), e);

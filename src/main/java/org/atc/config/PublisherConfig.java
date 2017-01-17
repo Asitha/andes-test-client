@@ -29,14 +29,6 @@ public class PublisherConfig extends PubSubConfig {
     @XmlAttribute
     private String messageContent;
 
-    public final int getPublisherMaxThroughput() {
-        return publisherMaxThroughput;
-    }
-
-    final void setPublisherMaxThroughput(int publisherMaxThroughput) {
-        this.publisherMaxThroughput = publisherMaxThroughput;
-    }
-
     public final String getMessageContent() {
         return messageContent;
     }

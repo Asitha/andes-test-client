@@ -19,6 +19,7 @@ package org.atc;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
+import com.google.common.util.concurrent.RateLimiter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.atc.config.SubscriberConfig;
@@ -83,12 +84,19 @@ public class ConsumerThread implements Runnable {
         log.info("Starting consumer to receive " + messageCount + " messages from " + config.getQueueName() +
                 " Consumer ID: " + consumerID);
         ATCMessage message = null;
-
+        RateLimiter rateLimiter = null;
+        if (config.getMessagesPerSecond() != 0) {
+            rateLimiter = RateLimiter.create(config.getMessagesPerSecond());
+        }
         try {
             long latency;
             for (int i = 1; i <= messageCount; i++) {
 
+                if (null != rateLimiter) {
+                    rateLimiter.acquire(); // wait for a permit to publish or block
+                }
                 message = consumer.receive();
+
                 if (config.getReceiveWaitTimeMillis() > 0) {
                     try {
                         TimeUnit.MILLISECONDS.sleep(config.getReceiveWaitTimeMillis());

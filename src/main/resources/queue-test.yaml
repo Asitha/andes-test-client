@@ -62,6 +62,7 @@ queuePublishers:
     isTransactional: false
     transactionBatchSize: 10
     parallelThreads: 1
+    messagesPerSecond: 1500
     messageContent: "test message content"
 #     failoverParams: failover='roundrobin'&brokerlist='tcp://10.100.5.94:5672?connectdelay='1000'&connecttimeout='3000'&retries='1';tcp://10.100.5.94:5673?connectdelay='1000'&connecttimeout='3000'&retries='1''
 
@@ -76,6 +77,7 @@ queueSubscribers:
     messageCount: 100
     parallelThreads: 1
     enableClientAcknowledgment: true
+    messagesPerSecond: 1500
     isTransactional: false
 
 ## End of subscriber configurations

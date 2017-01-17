@@ -18,11 +18,11 @@ package org.atc.config;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Field;
+import java.util.UUID;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import java.lang.reflect.Field;
-import java.util.UUID;
 
 @SuppressWarnings("unused")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -62,6 +62,9 @@ public abstract class PubSubConfig {
     private String failoverParams;
     @XmlAttribute
     private int delayBetweenMsgs;
+
+    @XmlAttribute
+    private int messagesPerSecond;
 
     PubSubConfig() {
         id = UUID.randomUUID().toString();
@@ -110,6 +113,14 @@ public abstract class PubSubConfig {
         }
 
         return builder.toString();
+    }
+
+    public int getMessagesPerSecond() {
+        return messagesPerSecond;
+    }
+
+    public void setMessagesPerSecond(int messagesPerSecond) {
+        this.messagesPerSecond = messagesPerSecond;
     }
 
     public final int getPort() {

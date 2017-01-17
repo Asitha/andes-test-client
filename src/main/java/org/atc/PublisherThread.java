@@ -18,6 +18,7 @@ package org.atc;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
+import com.google.common.util.concurrent.RateLimiter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -87,14 +88,24 @@ public class PublisherThread implements Runnable {
                 "  Publisher ID: " + publisherID);
         ATCMessage atcMessage = null;
         String messageContent = config.getMessageContent();
+
         if(StringUtils.isEmpty(messageContent)) {
             messageContent = DEFAULT_CONTENT;
+        }
+
+        RateLimiter rateLimiter = null;
+        if (config.getMessagesPerSecond() != 0) {
+            rateLimiter = RateLimiter.create(config.getMessagesPerSecond());
         }
 
         try {
             for (int i = 1; i <= messageCount; i++) {
                 atcMessage = publisher.createTextMessage(messageContent);
                 atcMessage.setMessageID(publisherID + "-" + i);
+
+                if (null != rateLimiter) {
+                    rateLimiter.acquire(); // wait for a permit to publish or block
+                }
                 publisher.send(atcMessage);
 
                 if (log.isDebugEnabled()) {
@@ -104,7 +115,7 @@ public class PublisherThread implements Runnable {
                 publishRate.mark();
 
                 if (config.getDelayBetweenMsgs() > 0) {
-                    TimeUnit.NANOSECONDS.sleep(publisher.getConfigs().getDelayBetweenMsgs());
+                    TimeUnit.MILLISECONDS.sleep(config.getDelayBetweenMsgs());
                 }
             }
 
@@ -126,6 +137,7 @@ public class PublisherThread implements Runnable {
 
     private void transactionalPublish() {
         long messageCount = publisher.getConfigs().getMessageCount();
+        PublisherConfig config = publisher.getConfigs();
         String publisherID = publisher.getConfigs().getId();
 
         log.info("Starting transactional publisher to send " + messageCount + " messages to " +
@@ -137,13 +149,22 @@ public class PublisherThread implements Runnable {
         if(StringUtils.isEmpty(messageContent)) {
             messageContent = DEFAULT_CONTENT;
         }
+
         DisruptorBasedPublisher disruptorPublisher =
                 new DisruptorBasedPublisher(batchSize, publisher, sentCount, publishRate);
+
+        RateLimiter rateLimiter = null;
+        if (config.getMessagesPerSecond() != 0) {
+            rateLimiter = RateLimiter.create(config.getMessagesPerSecond());
+        }
 
         for (int i = 1; i <= messageCount; i++) {
             try {
                 atcMessage = publisher.createTextMessage(messageContent);
                 atcMessage.setMessageID(Integer.toString(i));
+                if (null != rateLimiter) {
+                    rateLimiter.acquire();  // wait for a permit to publish or block
+                }
                 disruptorPublisher.publish(atcMessage);
             } catch (ATCException e) {
                 log.error("Exception occurred while creating message for publisher " + publisherID, e);
