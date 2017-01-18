@@ -5,9 +5,13 @@ Overview
 -----------
 Performance testing client for WSO2 Message Broker. 
 
-Goal of this project is to write a comprehensive test client for [WSO2 Message Broker (MB)](http://wso2.com/products/message-broker/). This is a java based  console application with the capability to run test scenarios according to a configuration file given at startup. 
+Goal of this project is to write a comprehensive test client for 
+[WSO2 Message Broker (MB)](http://wso2.com/products/message-broker/). 
+This is a java based  console application with the capability to run test scenarios according to a configuration file 
+given at startup. 
 
-Currently this client supports testing AMQP protocol based functionality of MB. Client is written using [JMS](https://docs.oracle.com/javaee/6/tutorial/doc/bncdr.html)
+Currently this client supports testing AMQP protocol based functionality of MB. Client is written using 
+[JMS](https://docs.oracle.com/javaee/6/tutorial/doc/bncdr.html)
 
 #### Supported functionality
 
@@ -33,23 +37,27 @@ Currently this client supports testing AMQP protocol based functionality of MB. 
 
 Build
 ------
-To get started clone this project and build using maven
+To get started clone this project and build using maven (or else get the binaries from the 
+[releases](https://github.com/Asitha/andes-test-client/releases).)
+
 ```
  mvn clean install
 ```
 
 Run
 ----
-Extract andes-test-client-\<VERSION\>-pack.zip in `target/` directory. Inside the extracted file execute the **client.sh** file to run the client. This will use the default configuration file (\<ATC_HOME\>/conf/client.yaml) to run the test.
+Extract andes-test-client-\<VERSION\>-pack.zip in `target/` directory. Inside the extracted file execute the 
+**andes-test-client_\<VERSION\>** executable to run the client. This will use the default configuration file 
+(\<ATC_HOME\>/conf/client.yaml) to run the test.
 ```
-sh client.sh
+$ ./andes-test-client_1.0-SNAPSHOT
 ```
 If you want to run a different test configuration point to that file using option `--conf` or `-c`
 
 ```
-sh client.sh --conf <path to configuration file>
+$ ./andes-test-client_1.0-SNAPSHOT --conf <path to configuration file>
 
-sh client.sh -c <path to configuration file>
+$ ./andes-test-client_1.0-SNAPSHOT -c <path to configuration file>
 ```
 
 Configure Test Cases
